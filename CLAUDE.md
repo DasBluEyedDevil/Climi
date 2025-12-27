@@ -57,6 +57,27 @@ After implementation, verify consistency:
 ./skills/gemini.agent.wrapper.sh --schema issues -d "@src/" "Find problems"
 ```
 
+## Output Format
+
+Gemini responses are structured for easy parsing:
+
+```
+## SUMMARY
+[1-2 sentence overview]
+
+## FILES
+- path/to/file.ext:LINE - brief description
+
+## ANALYSIS
+[detailed findings]
+
+## RECOMMENDATIONS
+1. First actionable item
+2. Second actionable item
+```
+
+**Note**: Output is quiet by default (no decorative headers). Use `--verbose` for human debugging.
+
 ## When to Use Gemini
 
 ### ✅ Use Gemini For:

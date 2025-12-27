@@ -124,8 +124,11 @@ Options:
   --cache               Cache response for repeated queries
   --schema SCHEMA       Structured output (files, issues, plan, json)
   --batch FILE          Process multiple queries from file
+  --verbose             Show status messages (quiet by default for AI consumption)
   --dry-run             Show prompt without executing
 ```
+
+**Note**: Output is quiet by default (only Gemini's response), optimized for Claude Code consumption. Use `--verbose` for human debugging.
 
 ### Important: Handling Large Codebases
 

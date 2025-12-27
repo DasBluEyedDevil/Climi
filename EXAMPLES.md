@@ -24,32 +24,36 @@ Show me:
 ### Gemini's Response
 
 ```
-Authentication Analysis:
+## SUMMARY
+Authentication uses JWT tokens with StateFlow-based state management in AuthManager.kt.
 
-1. Main Classes:
-   - AuthManager.kt (lines 1-350): Core authentication logic
-   - AuthState.kt (lines 1-45): State sealed class
-   - LoginViewModel.kt (lines 1-200): UI state management
+## FILES
+- AuthManager.kt:1-350 - Core authentication logic
+- AuthState.kt:1-45 - State sealed class
+- LoginViewModel.kt:1-200 - UI state management
+- AuthRepository.kt - Data layer abstraction
+- TokenStorage.kt - Secure token persistence
 
-2. Login State Flow:
-   - LoggedOut → Authenticating → Authenticated
-   - Implemented in AuthManager.kt:145-180
-   - Uses StateFlow for reactive updates
+## ANALYSIS
+**Login State Flow:**
+- LoggedOut → Authenticating → Authenticated
+- Implemented in AuthManager.kt:145-180
+- Uses StateFlow for reactive updates
 
-3. Token Refresh:
-   - Automatic refresh: AuthManager.kt:220-250
-   - Retry with exponential backoff
-   - Clears session on persistent failure
+**Token Refresh:**
+- Automatic refresh: AuthManager.kt:220-250
+- Retry with exponential backoff
+- Clears session on persistent failure
 
-4. Error Handling:
-   - Network errors: AuthManager.kt:280-330
-   - Timeout handling: 30 second request timeout
-   - Session cleanup in onCleared()
+**Error Handling:**
+- Network errors: AuthManager.kt:280-330
+- Timeout handling: 30 second request timeout
+- Session cleanup in onCleared()
 
-5. Key Files:
-   - AuthManager.kt: Primary authentication logic
-   - AuthRepository.kt: Data layer abstraction
-   - TokenStorage.kt: Secure token persistence
+## RECOMMENDATIONS
+1. Review AuthManager.kt:145-180 for state transition logic
+2. Check TokenStorage.kt for secure persistence patterns
+3. Note error handling in AuthManager.kt:280-330
 ```
 
 ### Step 2: Claude Code Implements Enhancement
@@ -104,40 +108,30 @@ Trace:
 ### Gemini's Response
 
 ```
-Bug Trace Analysis:
+## SUMMARY
+NullPointerException at SessionManager.kt:245 caused by race condition during logout where userData is nullified before endSession() completes.
 
-1. Logout Trigger:
-   - AuthManager.kt:320: onLogoutRequested callback
-   - Emits LoggedOut state via StateFlow
+## FILES
+- AuthManager.kt:320 - Logout trigger (onLogoutRequested callback)
+- AuthRepository.kt:85 - Observes state, calls clearSession()
+- SessionRepository.kt:140 - clearSession() calls SessionManager.endSession()
+- SessionManager.kt:180 - Sets userData to null
+- SessionManager.kt:245 - CRASH LOCATION
 
-2. Propagation Chain:
-   - AuthManager.kt:320 → StateFlow update
-   - AuthRepository.kt:85: Observes state, calls clearSession()
-   - SessionRepository.kt:140: clearSession() calls SessionManager.endSession()
-   - SessionManager.kt:245: CRASHES HERE
+## ANALYSIS
+**Call Chain:**
+AuthManager.kt:320 → AuthRepository.kt:85 → SessionRepository.kt:140 → SessionManager.kt:245
 
-3. Null Value:
-   - SessionManager.kt:245: `activeSession?.userData.saveMetrics()`
-   - `activeSession` is non-null BUT `userData` is null
-   - userData is initialized in startSession() from auth response
-   - When logout starts, userData is set to null (line 180)
-   - BUT endSession() assumes userData exists
+**Root Cause:**
+- `activeSession?.userData.saveMetrics()` at line 245
+- `activeSession` is non-null BUT `userData` is null
+- userData is set to null at line 180 before endSession() runs
+- Race condition: no synchronization between nullify and usage
 
-4. Root Cause:
-   - Race condition: Logout sets userData=null before endSession() runs
-   - No null check at line 245
-
-5. Call Chain:
-   AuthManager.kt:320 (onLogoutRequested)
-     ↓
-   AuthRepository.kt:85 (observeAuthState)
-     ↓
-   SessionRepository.kt:140 (clearSession)
-     ↓
-   SessionManager.kt:245 (endSession — CRASH)
-
-Recommended Fix:
-Add null-safe check: `activeSession?.userData?.saveMetrics()` (line 245)
+## RECOMMENDATIONS
+1. Add null-safe check: `activeSession?.userData?.saveMetrics()` at line 245
+2. Consider atomic state transition for logout sequence
+3. Review similar patterns in SessionManager for other potential null issues
 ```
 
 ### Step 2: Claude Code Fixes the Bug
