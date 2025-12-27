@@ -1,33 +1,37 @@
-# Multi-Agent Workflow
+# Gemini Context Companion for Claude Code
 
-A token-efficient orchestration system that delegates specialized tasks to multiple AI CLI agents, reducing Claude's token consumption by up to 90%.
+A token-efficient workflow that leverages Gemini's 1M+ token context window to provide comprehensive code analysis to Claude Code, reducing Claude's token consumption by up to 95%.
 
 ## Overview
 
-Instead of Claude reading files and writing code directly (expensive), this workflow delegates:
+Instead of Claude Code reading large files and entire codebases directly (expensive), this workflow delegates code analysis and research to **Gemini**, which has a massive 1M+ token context window. Gemini reads entire codebases, provides architectural insights, traces bugs across multiple files, and delivers concise summaries back to Claude for implementation.
 
-| Task | Agent | Why |
-|------|-------|-----|
-| Code analysis | **Gemini** | 1M+ token context window - reads entire codebases |
-| UI/Visual work | **Codex** | Specialized for frontend, complex algorithms |
-| Backend/GitHub | **Copilot** | Native GitHub integration, backend expertise |
-| Orchestration | **Claude** | Strategic decisions, coordination, specs |
+**Result**: Claude uses ~300 tokens for analysis instead of ~6,500+ tokens (95% savings).
 
-**Result**: Claude uses ~3k tokens per task instead of ~35k (91% savings).
+## Why Gemini as a Companion?
+
+| Challenge | Solution |
+|-----------|----------|
+| **Large codebases** | Gemini reads entire directories with 1M+ context window |
+| **Token limits** | Claude delegates reading to Gemini, conserves its tokens |
+| **Complex analysis** | Gemini traces patterns across hundreds of files |
+| **Architectural understanding** | Gemini provides high-level overviews before implementation |
+| **Bug tracing** | Gemini follows call stacks through multiple files |
 
 ## Prerequisites
 
 ### Platform
-- **Windows**: WSL or Git Bash required (all wrappers are bash scripts)
+- **Windows**: WSL or Git Bash required (wrapper is a bash script)
 - **macOS/Linux**: Native bash
 
-### CLI Tools
+### Gemini CLI
 
-| CLI | Installation | Purpose |
-|-----|--------------|---------|
-| Gemini | See [Google AI docs](https://ai.google.dev/gemini-api/docs/cli) | Code analysis |
-| Codex | `npm install -g @openai/codex-cli` | UI/frontend work |
-| Copilot | `npm install -g @github/copilot-cli` | Backend/GitHub ops |
+Install the Gemini CLI following the [official documentation](https://ai.google.dev/gemini-api/docs/cli).
+
+Verify installation:
+```bash
+gemini --version
+```
 
 ## Quick Start
 
@@ -35,81 +39,75 @@ Instead of Claude reading files and writing code directly (expensive), this work
 ```bash
 git clone <repo-url>
 cd Multi-Agent-Workflow
-chmod +x skills/*.sh
+chmod +x skills/gemini.agent.wrapper.sh
 ```
 
-### 2. Verify CLIs
+### 2. Basic Usage
+
+**Analyze code architecture**:
 ```bash
-gemini --version
-codex --version
-copilot --version
+./skills/gemini.agent.wrapper.sh -d "@src/" "How is authentication implemented? Provide file paths with line numbers."
 ```
 
-### 3. Basic Usage
-
-**Analyze code (Gemini)**:
+**Trace a bug**:
 ```bash
-./skills/gemini.agent.wrapper.sh -d "@src/" "How is authentication implemented?"
+./skills/gemini.agent.wrapper.sh -d "@app/src/" "Bug: Connection drops after 30 seconds. Trace the timeout handling logic through all files."
 ```
 
-**Implement UI (Codex)**:
+**Understand a feature**:
 ```bash
-./skills/codex.agent.wrapper.sh "IMPLEMENTATION TASK:
-**Objective**: Create login form component
-**Requirements**: Email/password fields, validation, submit button
-**After Completion**: Run tests, take screenshots"
+./skills/gemini.agent.wrapper.sh -d "@app/" "Explain how workout data flows from BLE device to UI. Show the complete data pipeline."
 ```
 
-**Implement backend (Copilot)**:
-```bash
-./skills/copilot.agent.wrapper.sh --allow-write "IMPLEMENTATION TASK:
-**Objective**: Add user authentication endpoint
-**Requirements**: JWT tokens, password hashing, rate limiting
-**After Completion**: Run tests, report results"
-```
-
-## Workflow
+## Workflow: Claude Code + Gemini
 
 ```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Claude    │────▶│   Gemini    │────▶│   Codex/    │
-│ Orchestrator│     │  Analyzer   │     │   Copilot   │
-└─────────────┘     └─────────────┘     └─────────────┘
-      │                   │                    │
-      │ 1. Requirements   │ 2. Analysis        │ 3. Implementation
-      │ (~1k tokens)      │ (0 Claude tokens)  │ (0 Claude tokens)
-      ▼                   ▼                    ▼
-┌─────────────────────────────────────────────────────┐
-│                  Cross-Check                         │
-│         Codex reviews Copilot's work                │
-│         Copilot reviews Codex's work                │
-└─────────────────────────────────────────────────────┘
-                          │
-                          ▼ 4. Verify (Gemini)
-                    ┌───────────┐
-                    │  Complete │
-                    └───────────┘
+┌─────────────┐          ┌─────────────┐
+│    Claude   │◄────────▶│   Gemini    │
+│    Code     │          │  Analyzer   │
+│ (Developer) │          │  (Research) │
+└─────────────┘          └─────────────┘
+      │                        │
+      │ 1. Query Analysis      │
+      │ (~300 tokens)          │
+      ├───────────────────────▶│
+      │                        │ Reads entire
+      │                        │ codebase
+      │                        │ (0 Claude tokens)
+      │                        │
+      │ 2. Analysis Results    │
+      │ (concise summary)      │
+      │◄───────────────────────┤
+      │                        │
+      ▼                        │
+ 3. Implement                  │
+ (Claude Code)                 │
+      │                        │
+      │ 4. Verify Changes      │
+      ├───────────────────────▶│
+      │                        │
+      │ 5. Verification Report │
+      │◄───────────────────────┤
+      ▼
+   Complete
 ```
 
 ## File Structure
 
 ```
 ./
-├── CLAUDE.md                      # Quick reference for Claude
-├── README.md                      # This file
+├── .archive/                  # Archived engineering subagents
+├── README.md                  # This file
+├── CLAUDE.md                  # Quick reference for Claude Code
+├── EXAMPLES.md                # Real-world workflow examples
 └── skills/
-    ├── Claude-Orchestrator.md     # Orchestration patterns
     ├── Gemini-Researcher.md       # Analysis query patterns
     ├── gemini.agent.wrapper.sh    # Gemini CLI wrapper
-    ├── Codex-Engineer.md          # UI implementation patterns
-    ├── codex.agent.wrapper.sh     # Codex CLI wrapper
-    ├── Copilot-Engineer.md        # Backend implementation patterns
-    └── copilot.agent.wrapper.sh   # Copilot CLI wrapper
+    └── Claude-Code-Integration.md # Integration guide
 ```
 
-## Wrapper Reference
+## Gemini Wrapper Reference
 
-### Gemini (Code Analysis)
 ```bash
 ./skills/gemini.agent.wrapper.sh [OPTIONS] "<prompt>"
 
@@ -121,114 +119,152 @@ Options:
   -o, --output FORMAT Output format (text, json)
 ```
 
-### Codex (UI/Algorithms)
+### Important: Handling Large Codebases
+
+When analyzing very large directories (1000s of files), use targeted subdirectories to avoid file handle overflow:
+
+❌ **Don't**: Analyze entire large directory
 ```bash
-./skills/codex.agent.wrapper.sh [OPTIONS] "<prompt>"
-
-Options:
-  -m, --model MODEL   Model: gpt-5 (default), o3, o3-mini
-  --safe-mode         Require approval for operations
-  --sandbox MODE      read-only, workspace-write, danger-full-access
-  -C, --working-dir   Set working directory
-  --enable-search     Enable web search
-  -f, --prompt-file   Read prompt from file
+./skills/gemini.agent.wrapper.sh -d "@large-project/" "analyze code"
 ```
 
-### Copilot (Backend/GitHub)
+✅ **Do**: Use targeted subdirectories or search first
 ```bash
-./skills/copilot.agent.wrapper.sh [OPTIONS] "<prompt>"
+# Analyze specific subdirectories
+./skills/gemini.agent.wrapper.sh -d "@large-project/src/auth/" "analyze authentication"
 
-Options:
-  --allow-write       Allow file write operations
-  --allow-git         Allow git ops (denies force push)
-  --allow-npm         Allow npm commands
-  --allow-github      Allow GitHub operations
-  --allow-tool PAT    Allow specific tool pattern
-  --deny-tool PAT     Deny specific tool pattern
+# Or use grep first to find relevant files
+grep -r "authentication" src/ -l | head -20
+./skills/gemini.agent.wrapper.sh -d "@src/auth/" "analyze authentication"
 ```
 
-## Task Templates
+## Common Query Patterns
 
-### Implementation Task
-```
-IMPLEMENTATION TASK:
+### Architecture Analysis
+```bash
+./skills/gemini.agent.wrapper.sh -d "@app/src/" "
+Analyze architecture for implementing [feature].
 
-**Objective**: [Clear, one-line goal]
-
-**Requirements**:
-- [Requirement 1]
-- [Requirement 2]
-
-**Context from Gemini**:
-[Paste analysis results]
-
-**Files to Modify**:
-- path/file.ext: [changes needed]
-
-**TDD Required**: Yes/No
-
-**After Completion**:
-1. Run tests
-2. Report: changes, test results, issues
+Provide:
+1. Current patterns and file organization
+2. Files that will be affected
+3. Dependencies and risks
+4. Recommended approach with examples from existing code
+"
 ```
 
-### Code Review Task
+### Bug Tracing
+```bash
+./skills/gemini.agent.wrapper.sh -d "@app/src/" "
+Bug: [description]
+Location: [file:line]
+
+Trace:
+1. Root cause through call stack
+2. All affected files with line numbers
+3. Similar patterns with same issue
+4. Recommended fix
+"
 ```
-CODE REVIEW:
 
-**Feature**: [name]
-**Files**: [list]
+### Implementation Verification
+```bash
+./skills/gemini.agent.wrapper.sh -d "@app/src/" "
+Changes implemented:
+- [file1]: [changes]
+- [file2]: [changes]
 
-**Check**:
-1. Logic errors
-2. Edge cases
-3. Code quality
-4. Test coverage
-
-**Verdict**: APPROVED / NEEDS CHANGES
+Verify:
+1. Architectural consistency
+2. No regressions
+3. Best practices followed
+4. Security implications
+5. Edge cases handled
+"
 ```
+
+## Token Savings Examples
+
+### Example 1: Understanding BLE Implementation
+
+**❌ Old Way (Claude reads directly)**:
+- Claude reads BleManager.kt (2k tokens)
+- Claude reads BleService.kt (3k tokens)
+- Claude reads BleRepository.kt (1.5k tokens)
+- **Total: 6.5k tokens**
+
+**✅ New Way (Gemini analyzes)**:
+- Claude queries Gemini (300 tokens)
+- Gemini reads all files (0 Claude tokens)
+- Gemini responds with summary (0 Claude tokens)
+- **Total: 300 tokens (95% savings!)**
+
+### Example 2: Full Codebase Audit
+
+**❌ Old Way**:
+- Claude would need to read chunks of the codebase
+- Multiple context windows required
+- Estimated: 50k+ tokens
+
+**✅ New Way**:
+- Single Gemini query with `--all-files`
+- Comprehensive audit with 0 Claude read tokens
+- Claude only pays for the query and result
+- **Total: ~500 tokens (99% savings!)**
 
 ## Best Practices
 
-### Do
-- Always query Gemini before implementing
-- Use specific, structured prompts
-- Include context from previous agent responses
-- Request file paths and line numbers
-- Cross-check between Codex and Copilot
+### ✅ Do
+- **Always query Gemini before implementing** - Let Gemini read the codebase first
+- **Be specific** - Request file paths, line numbers, and code excerpts
+- **Use structured prompts** - Ask for numbered lists and clear sections
+- **Include context** - Mention error messages, file locations, or symptoms
+- **Verify changes** - Ask Gemini to review your implementation for consistency
 
-### Don't
-- Have Claude read large files directly
-- Skip the analysis phase
-- Use vague prompts ("fix this", "improve code")
-- Forget to specify acceptance criteria
+### ❌ Don't
+- **Skip analysis** - Don't have Claude read large files directly
+- **Use vague prompts** - Avoid "how does this work?" without specifics
+- **Forget follow-up** - Always verify changes with Gemini after implementation
+- **Overload queries** - Break complex questions into focused queries
+
+## Integration with Claude Code
+
+See [`skills/Claude-Code-Integration.md`](skills/Claude-Code-Integration.md) for detailed integration patterns and workflows.
+
+See [`EXAMPLES.md`](EXAMPLES.md) for real-world examples of Gemini-Claude Code workflows.
 
 ## Troubleshooting
 
-### "command not found: gemini/codex/copilot"
-Ensure CLIs are installed and in PATH. On Windows, run from WSL or Git Bash.
+### "command not found: gemini"
+Ensure Gemini CLI is installed and in PATH. On Windows, run from WSL or Git Bash.
 
 ### EMFILE: too many open files
-When analyzing large directories with Gemini, use targeted subdirectories:
+Use targeted subdirectories instead of entire large projects:
 ```bash
-# Instead of
+# Instead of analyzing entire project
 ./skills/gemini.agent.wrapper.sh -d "@large-project/" "..."
 
-# Use
+# Analyze specific subdirectories
 ./skills/gemini.agent.wrapper.sh -d "@large-project/src/specific/" "..."
 ```
 
 ### Wrapper permission denied
 ```bash
-chmod +x skills/*.sh
+chmod +x skills/gemini.agent.wrapper.sh
 ```
+
+## What Happened to Codex and Copilot?
+
+This repository previously included Codex and Copilot as "engineering subagents" for implementation work. The repository has been refocused on Gemini's unique strength: its massive context window for research and analysis as a companion to Claude Code.
+
+If you need the multi-agent version, see the [`.archive/`](.archive/) directory and git history.
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Update relevant skill documentation
-4. Test wrapper scripts
+3. Update Gemini-related documentation
+4. Test wrapper script
 5. Submit PR
 
 ## License
