@@ -142,6 +142,31 @@ Templates provide structured query formats for common tasks:
 | `verify` | Post-implementation verification |
 | `architecture` | System architecture overview |
 
+### Conversation Mode (--chat)
+
+To maintain context across multiple queries (like a chat session), use the `--chat` flag with a session name:
+
+```bash
+# First query starts the session
+./skills/gemini.agent.wrapper.sh --chat my-session "Explain the auth logic"
+
+# Second query knows about the first
+./skills/gemini.agent.wrapper.sh --chat my-session "Can you simplify that function?"
+```
+
+History is stored in `.gemini/history/<session-name>.json`.
+
+### Smart Context (--smart-ctx)
+
+Instead of manually specifying directories, let the wrapper find relevant files using keyword search:
+
+```bash
+# Automatically finds files containing "authentication" and adds them to context
+./skills/gemini.agent.wrapper.sh --smart-ctx "authentication" "Review the security"
+```
+
+This uses `grep` to find the top 20 relevant files, preventing token waste on unrelated files.
+
 ### Context Injection with GEMINI.md
 
 Place a `GEMINI.md` file in your project root or `.gemini/` directory to auto-inject context:
@@ -190,6 +215,7 @@ Include staged changes or compare against a branch:
 # Compare against main branch
 ./skills/gemini.agent.wrapper.sh --diff main -d "@src/" "Review my feature branch changes"
 ```
+
 
 #### Response Caching (`--cache`)
 

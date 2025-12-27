@@ -36,6 +36,9 @@ CACHE_DIR=".gemini/cache"
 OUTPUT_SCHEMA=""
 BATCH_FILE=""
 VERBOSE=false  # Quiet by default for Claude consumption
+CHAT_SESSION=""
+SMART_CTX_KEYWORDS=""
+HISTORY_DIR=".gemini/history"
 
 # Role definitions - Built-in roles
 # All roles include structured output instructions for Claude consumption
@@ -211,6 +214,8 @@ ${BLUE}OPTIONS:${NC}
     --clear-cache          Clear all cached responses
     --schema SCHEMA        Request structured output: files, issues, plan, json
     --batch FILE           Process multiple queries from file (one per line)
+    --chat SESSION         Enable conversation mode with session history
+    --smart-ctx KEYWORDS   Auto-find context using keywords (grep strategy)
     --verbose              Show status messages (quiet by default for AI consumption)
     --dry-run              Show constructed prompt without executing
     -h, --help             Display this help message
@@ -333,6 +338,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --batch)
             BATCH_FILE="$2"
+            shift 2
+            ;;
+        --chat)
+            CHAT_SESSION="$2"
+            shift 2
+            ;;
+        --smart-ctx)
+            SMART_CTX_KEYWORDS="$2"
             shift 2
             ;;
         --verbose|-v)
@@ -458,6 +471,69 @@ if [ -n "$ROLE" ]; then
 fi
 
 # 3. Add directories if specified
+
+
+# 3a. Add Smart Context if specified
+if [ -n "$SMART_CTX_KEYWORDS" ]; then
+    echo -e "${CYAN}🧠 Finding smart context for: '$SMART_CTX_KEYWORDS'${NC}" >&2
+    
+    # Exclude common ignores and find files containing keywords
+    # Limit to top 20 files to avoid token explosion
+    SMART_FILES=$(grep -r -l --exclude-dir={.git,.gemini,node_modules,build,dist,.idea} "$SMART_CTX_KEYWORDS" . 2>/dev/null | head -n 20)
+    
+    if [ -n "$SMART_FILES" ]; then
+        FULL_PROMPT="${FULL_PROMPT}
+---
+**Smart Context** (Files containing '$SMART_CTX_KEYWORDS'):
+"
+        for FILE in $SMART_FILES; do
+            # Read first 100 lines of each file to be safe
+            CONTENT=$(head -n 100 "$FILE")
+            FULL_PROMPT="${FULL_PROMPT}
+File: $FILE
+\`\`\`
+$CONTENT
+\`\`\`
+"
+        done
+        echo -e "${CYAN}✓ Added $(echo "$SMART_FILES" | wc -l) files to context${NC}" >&2
+    else
+        echo -e "${YELLOW}⚠ No smart context found for keywords${NC}" >&2
+    fi
+fi
+
+# 3b. Add Chat History if specified
+if [ -n "$CHAT_SESSION" ]; then
+    mkdir -p "$HISTORY_DIR"
+    HIST_FILE="$HISTORY_DIR/${CHAT_SESSION}.json"
+    
+    if [ -f "$HIST_FILE" ]; then
+        # Check if jq is installed for proper JSON parsing
+        if command -v jq &> /dev/null; then
+            # Format history from JSON structure
+            HISTORY_CONTENT=$(jq -r '.[] | "User: \(.user)\nGemini: \(.gemini)\n---"' "$HIST_FILE")
+        else
+            # Simple fallback if jq is missing (assumes simple structure or pure text log)
+            # Warning: This is brittle. Users should install jq.
+             echo -e "${YELLOW}⚠ 'jq' not found. Chat history might be parsed incorrectly.${NC}" >&2
+             HISTORY_CONTENT=$(cat "$HIST_FILE")
+        fi
+
+        if [ -n "$HISTORY_CONTENT" ]; then
+            FULL_PROMPT="${FULL_PROMPT}
+
+Previous Conversation History:
+$HISTORY_CONTENT
+
+(End of History)
+---
+"
+            [ "$VERBOSE" = true ] && echo -e "${CYAN}📜 Loaded chat history from session: $CHAT_SESSION${NC}" >&2
+        fi
+    fi
+fi
+
+# 3c. Add directories if specified
 if [ -n "$DIRECTORIES" ]; then
     FULL_PROMPT="${FULL_PROMPT}$DIRECTORIES
 
@@ -668,6 +744,35 @@ fi
 if [ "$USE_CACHE" = true ] && [ $EXIT_CODE -eq 0 ] && [ -n "$CACHE_FILE" ]; then
     echo "$RESPONSE" > "$CACHE_FILE"
     [ "$VERBOSE" = true ] && echo -e "${CYAN}💾 Response cached (hash: ${CACHE_KEY:0:8}...)${NC}" >&2
+fi
+
+# Save to Chat History if successful
+if [ -n "$CHAT_SESSION" ] && [ $EXIT_CODE -eq 0 ]; then
+    mkdir -p "$HISTORY_DIR"
+    HIST_FILE="$HISTORY_DIR/${CHAT_SESSION}.json"
+    
+    # Create valid JSON entry
+    # Escape quotes and backslashes for JSON safety
+    SAFE_PROMPT=$(echo "$PROMPT" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+    SAFE_RESPONSE=$(echo "$RESPONSE" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+    
+    ENTRY="{\"user\": \"$SAFE_PROMPT\", \"gemini\": \"$SAFE_RESPONSE\", \"timestamp\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"}"
+    
+    if [ ! -f "$HIST_FILE" ]; then
+        echo "[$ENTRY]" > "$HIST_FILE"
+    else
+        # Remove closing bracket, add comma, add new entry, add closing bracket
+        # This is a bit hacky but works without jq
+        # If jq exists, use it for safer appending?
+        if command -v jq &> /dev/null; then
+             # Use a temporary file to avoid race conditions/corruption
+             jq ". + [$ENTRY]" "$HIST_FILE" > "${HIST_FILE}.tmp" && mv "${HIST_FILE}.tmp" "$HIST_FILE"
+        else
+             sed -i '$d' "$HIST_FILE"
+             echo ",$ENTRY]" >> "$HIST_FILE"
+        fi
+    fi
+    [ "$VERBOSE" = true ] && echo -e "${CYAN}💾 Chat history saved to $CHAT_SESSION${NC}" >&2
 fi
 
 if [ "$VERBOSE" = true ]; then
