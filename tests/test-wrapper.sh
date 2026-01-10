@@ -85,6 +85,112 @@ else
 fi
 TESTS_RUN=$((TESTS_RUN + 1))
 
+# Test 13: Cache TTL option
+run_test "Cache TTL flag" "test query" --cache --cache-ttl 3600 "test query"
+
+# Test 14: Retry count option
+run_test "Retry flag" "test query" --retry 3 "test query"
+
+# ═══════════════════════════════════════════════════════════
+# Parser tests (gemini-parse.sh)
+# ═══════════════════════════════════════════════════════════
+
+echo ""
+echo "Running gemini-parse.sh tests..."
+
+PARSER="$SCRIPT_DIR/../skills/gemini-parse.sh"
+
+# Test 15: Case-insensitive section parsing (uppercase)
+TEST_RESPONSE="## SUMMARY
+Test summary
+
+## FILES
+test.txt:1 - test file
+
+## ANALYSIS
+Test analysis
+
+## RECOMMENDATIONS
+1. Test recommendation"
+
+OUTPUT=$(echo "$TEST_RESPONSE" | "$PARSER" --section SUMMARY 2>&1) || true
+if echo "$OUTPUT" | grep -q "Test summary"; then
+    echo -e "${GREEN}✓${NC} Parser: uppercase SUMMARY section"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo -e "${RED}✗${NC} Parser: uppercase SUMMARY section"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+TESTS_RUN=$((TESTS_RUN + 1))
+
+# Test 16: Case-insensitive section parsing (lowercase)
+TEST_RESPONSE_LOWER="## summary
+Test summary lower
+
+## files
+test.txt:1 - test file
+
+## analysis
+Test analysis
+
+## recommendations
+1. Test recommendation"
+
+OUTPUT=$(echo "$TEST_RESPONSE_LOWER" | "$PARSER" --section summary 2>&1) || true
+if echo "$OUTPUT" | grep -q "Test summary lower"; then
+    echo -e "${GREEN}✓${NC} Parser: lowercase summary section"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo -e "${RED}✗${NC} Parser: lowercase summary section"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+TESTS_RUN=$((TESTS_RUN + 1))
+
+# Test 17: Parser validation (valid response)
+OUTPUT=$(echo "$TEST_RESPONSE" | "$PARSER" --validate 2>&1) || true
+if echo "$OUTPUT" | grep -q "valid"; then
+    echo -e "${GREEN}✓${NC} Parser: validates correct response"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo -e "${RED}✗${NC} Parser: validates correct response"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+TESTS_RUN=$((TESTS_RUN + 1))
+
+# Test 18: Parser validation (invalid response)
+INVALID_RESPONSE="Just some text without sections"
+OUTPUT=$(echo "$INVALID_RESPONSE" | "$PARSER" --validate 2>&1) || true
+if echo "$OUTPUT" | grep -q "Missing"; then
+    echo -e "${GREEN}✓${NC} Parser: detects missing sections"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo -e "${RED}✗${NC} Parser: detects missing sections"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+TESTS_RUN=$((TESTS_RUN + 1))
+
+# Test 19: Parser file extraction
+OUTPUT=$(echo "$TEST_RESPONSE" | "$PARSER" --files-only 2>&1) || true
+if echo "$OUTPUT" | grep -q "test.txt:1"; then
+    echo -e "${GREEN}✓${NC} Parser: extracts file references"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo -e "${RED}✗${NC} Parser: extracts file references"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+TESTS_RUN=$((TESTS_RUN + 1))
+
+# Test 20: Parser JSON output
+OUTPUT=$(echo "$TEST_RESPONSE" | "$PARSER" --files-only --json 2>&1) || true
+if echo "$OUTPUT" | grep -q '"files"'; then
+    echo -e "${GREEN}✓${NC} Parser: JSON output format"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo -e "${RED}✗${NC} Parser: JSON output format"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+TESTS_RUN=$((TESTS_RUN + 1))
+
 echo ""
 echo "════════════════════════════════════════"
 echo "Tests: $TESTS_RUN | Passed: $TESTS_PASSED | Failed: $TESTS_FAILED"

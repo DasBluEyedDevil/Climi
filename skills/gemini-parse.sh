@@ -90,17 +90,20 @@ else
     usage
 fi
 
-# Function to extract a section
+# Function to extract a section (case-insensitive matching)
 extract_section() {
     local section_name="$1"
     local content="$2"
-    
-    # Match from section header to next section or end
+
+    # Match from section header to next section or end (case-insensitive)
     echo "$content" | awk -v section="$section_name" '
         BEGIN { in_section = 0; found = 0 }
         /^## / {
             if (in_section) { in_section = 0 }
-            if ($0 ~ "^## " section) { in_section = 1; found = 1; next }
+            # Case-insensitive comparison: convert both to uppercase
+            header = toupper($0)
+            target = "^## " toupper(section)
+            if (header ~ target) { in_section = 1; found = 1; next }
         }
         in_section { print }
         END { exit !found }
@@ -123,24 +126,24 @@ validate_format() {
     local content="$1"
     local valid=true
     local issues=()
-    
-    # Check for required sections
-    if ! echo "$content" | grep -q "^## SUMMARY"; then
+
+    # Check for required sections (case-insensitive)
+    if ! echo "$content" | grep -qi "^## SUMMARY"; then
         issues+=("Missing ## SUMMARY section")
         valid=false
     fi
-    
-    if ! echo "$content" | grep -q "^## FILES"; then
+
+    if ! echo "$content" | grep -qi "^## FILES"; then
         issues+=("Missing ## FILES section")
         valid=false
     fi
-    
-    if ! echo "$content" | grep -q "^## ANALYSIS"; then
+
+    if ! echo "$content" | grep -qi "^## ANALYSIS"; then
         issues+=("Missing ## ANALYSIS section")
         valid=false
     fi
-    
-    if ! echo "$content" | grep -q "^## RECOMMENDATIONS"; then
+
+    if ! echo "$content" | grep -qi "^## RECOMMENDATIONS"; then
         issues+=("Missing ## RECOMMENDATIONS section")
         valid=false
     fi

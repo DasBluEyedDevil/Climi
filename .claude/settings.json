@@ -2,16 +2,21 @@
   "hooks": {
     "UserPromptSubmit": [
       {
-        "matcher": "",
+        "matcher": "(?i)(review|analyze|trace|debug|security|audit|architecture|understand|explain|how does|what does|find all|search for|look for|investigate)",
         "type": "prompt",
-        "prompt": "Before processing this request, consider: Does this involve reading >100 lines of code, analyzing architecture, tracing bugs across files, or reviewing security? If so, use the Gemini Research skill (./skills/gemini.agent.wrapper.sh) to analyze first, then implement based on Gemini's findings."
+        "prompt": "This request matches analysis patterns. Consider using Gemini Research skill (./skills/gemini.agent.wrapper.sh) to analyze first:\n- For code review: -r reviewer\n- For debugging: -r debugger\n- For security audit: -r security\n- For architecture: -t architecture\n- For feature planning: -t implement-ready"
+      },
+      {
+        "matcher": "(?i)(refactor|migrate|upgrade|update all|change all|rename)",
+        "type": "prompt",
+        "prompt": "This looks like a codebase-wide change. Consider using Gemini to analyze impact first:\n./skills/gemini.agent.wrapper.sh -r auditor -d \"@src/\" \"Analyze impact of: [your change]\""
       }
     ],
     "Stop": [
       {
         "matcher": "",
-        "type": "prompt", 
-        "prompt": "If you made code changes, consider verifying them with Gemini: ./skills/gemini.agent.wrapper.sh -t verify --diff 'Summary of changes'"
+        "type": "prompt",
+        "prompt": "If you made code changes, consider verifying with Gemini:\n./skills/gemini.agent.wrapper.sh -t verify --diff 'Summary of changes'"
       }
     ]
   },

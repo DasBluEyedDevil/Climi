@@ -70,6 +70,7 @@ INCLUDE_DIFF=false
 DIFF_TARGET="HEAD"
 USE_CACHE=false
 CACHE_DIR=".gemini/cache"
+CACHE_TTL=86400  # Default: 24 hours (in seconds)
 OUTPUT_SCHEMA=""
 BATCH_FILE=""
 VERBOSE=false  # Quiet by default for Claude consumption
@@ -269,6 +270,7 @@ ${BLUE}OPTIONS:${NC}
     --no-fallback          Disable automatic fallback to gemini-3-flash-preview
     --diff [TARGET]        Include git diff in prompt (default: HEAD, or specify commit/branch)
     --cache                Cache response for repeated queries
+    --cache-ttl SECONDS    Cache time-to-live in seconds (default: 86400 = 24h)
     --clear-cache          Clear all cached responses
     --schema SCHEMA        Request structured output: files, issues, plan, json
     --batch FILE           Process multiple queries from file (one per line)
@@ -384,6 +386,10 @@ while [[ $# -gt 0 ]]; do
         --cache)
             USE_CACHE=true
             shift
+            ;;
+        --cache-ttl)
+            CACHE_TTL="$2"
+            shift 2
             ;;
         --clear-cache)
             if [ -d "$CACHE_DIR" ]; then
@@ -857,61 +863,110 @@ if [ "$USE_CACHE" = true ]; then
     # Create cache directory if needed
     mkdir -p "$CACHE_DIR"
     
-    # Generate hash of the full prompt (using md5sum or fallback)
+    # Generate hash of model + prompt (using md5sum or fallback)
+    # Include model in hash to prevent serving cached response from different model
     if command -v md5sum &> /dev/null; then
-        CACHE_KEY=$(echo -n "$FULL_PROMPT" | md5sum | cut -d' ' -f1)
+        CACHE_KEY=$(echo -n "${MODEL}:${FULL_PROMPT}" | md5sum | cut -d' ' -f1)
     elif command -v md5 &> /dev/null; then
-        CACHE_KEY=$(echo -n "$FULL_PROMPT" | md5)
+        CACHE_KEY=$(echo -n "${MODEL}:${FULL_PROMPT}" | md5)
     else
         # Fallback: use first 32 chars of base64 encoded prompt
-        CACHE_KEY=$(echo -n "$FULL_PROMPT" | base64 | head -c 32)
+        CACHE_KEY=$(echo -n "${MODEL}:${FULL_PROMPT}" | base64 | head -c 32)
     fi
     CACHE_FILE="$CACHE_DIR/${CACHE_KEY}.txt"
-    
-    # Check if cached response exists
+
+    # Check if cached response exists and is not expired
     if [ -f "$CACHE_FILE" ]; then
-        [ "$VERBOSE" = true ] && echo -e "${CYAN}📦 Using cached response (hash: ${CACHE_KEY:0:8}...)${NC}"
-        cat "$CACHE_FILE"
-        [ "$VERBOSE" = true ] && echo -e "${GREEN}════════════════════════════════════════════════════════${NC}"
-        [ "$VERBOSE" = true ] && echo -e "${GREEN}✓ Gemini analysis complete (from cache)${NC}"
-        [ "$VERBOSE" = true ] && echo -e "${GREEN}════════════════════════════════════════════════════════${NC}"
-        exit 0
+        # Get file age in seconds (cross-platform: try GNU stat, then BSD stat)
+        if stat --version &>/dev/null 2>&1; then
+            # GNU stat (Linux)
+            FILE_AGE=$(( $(date +%s) - $(stat -c %Y "$CACHE_FILE") ))
+        else
+            # BSD stat (macOS)
+            FILE_AGE=$(( $(date +%s) - $(stat -f %m "$CACHE_FILE") ))
+        fi
+
+        if [ $FILE_AGE -lt $CACHE_TTL ]; then
+            [ "$VERBOSE" = true ] && echo -e "${CYAN}📦 Using cached response (hash: ${CACHE_KEY:0:8}..., age: ${FILE_AGE}s)${NC}"
+            cat "$CACHE_FILE"
+            [ "$VERBOSE" = true ] && echo -e "${GREEN}════════════════════════════════════════════════════════${NC}"
+            [ "$VERBOSE" = true ] && echo -e "${GREEN}✓ Gemini analysis complete (from cache)${NC}"
+            [ "$VERBOSE" = true ] && echo -e "${GREEN}════════════════════════════════════════════════════════${NC}"
+            exit 0
+        else
+            [ "$VERBOSE" = true ] && echo -e "${YELLOW}⚠ Cache expired (age: ${FILE_AGE}s > TTL: ${CACHE_TTL}s), refreshing...${NC}" >&2
+        fi
     fi
 fi
 
-# Execute gemini command with model selection and fallback
+# Execute gemini command with model selection, retry logic, and fallback
 CMD="$BASE_CMD -m $MODEL"
 log_message "Executing: $CMD"
 
-# Start progress spinner in verbose mode
-start_spinner "Calling Gemini API..."
+# Retry loop with exponential backoff
+ATTEMPT=0
+EXIT_CODE=1
+RESPONSE=""
 
-# Capture output if caching
-if [ "$USE_CACHE" = true ]; then
-    RESPONSE=$(eval "$CMD" '"$FULL_PROMPT"' 2>&1)
-    EXIT_CODE=$?
-    stop_spinner
-    echo "$RESPONSE"
-else
-    eval "$CMD" '"$FULL_PROMPT"'
-    EXIT_CODE=$?
-    stop_spinner
-fi
+while [ $ATTEMPT -lt $MAX_RETRIES ] && [ $EXIT_CODE -ne 0 ]; do
+    ATTEMPT=$((ATTEMPT + 1))
 
-# If primary model failed and fallback is enabled, try fallback model
-if [ $EXIT_CODE -ne 0 ] && [ "$USE_FALLBACK" = true ] && [ "$MODEL" = "$PRIMARY_MODEL" ]; then
-    [ "$VERBOSE" = true ] && echo -e "${YELLOW}⚠ Primary model ($MODEL) failed. Trying fallback model ($FALLBACK_MODEL)...${NC}" >&2
-    CMD="$BASE_CMD -m $FALLBACK_MODEL"
-    
+    # Add delay between retries (exponential backoff: 2s, 4s, 8s...)
+    if [ $ATTEMPT -gt 1 ]; then
+        DELAY=$((2 ** (ATTEMPT - 1)))
+        [ "$VERBOSE" = true ] && echo -e "${YELLOW}⚠ Attempt $ATTEMPT/$MAX_RETRIES (waiting ${DELAY}s)...${NC}" >&2
+        sleep $DELAY
+    fi
+
+    # Start progress spinner in verbose mode
+    start_spinner "Calling Gemini API (attempt $ATTEMPT/$MAX_RETRIES)..."
+
+    # Capture output if caching
     if [ "$USE_CACHE" = true ]; then
         RESPONSE=$(eval "$CMD" '"$FULL_PROMPT"' 2>&1)
         EXIT_CODE=$?
-        echo "$RESPONSE"
+        stop_spinner
     else
-        eval "$CMD" '"$FULL_PROMPT"'
+        RESPONSE=$(eval "$CMD" '"$FULL_PROMPT"' 2>&1)
         EXIT_CODE=$?
+        stop_spinner
+        echo "$RESPONSE"
     fi
-    
+
+    log_message "Attempt $ATTEMPT: exit code $EXIT_CODE"
+done
+
+# Output cached response after retry loop
+if [ "$USE_CACHE" = true ] && [ -n "$RESPONSE" ]; then
+    echo "$RESPONSE"
+fi
+
+# If primary model failed after retries and fallback is enabled, try fallback model
+if [ $EXIT_CODE -ne 0 ] && [ "$USE_FALLBACK" = true ] && [ "$MODEL" = "$PRIMARY_MODEL" ]; then
+    [ "$VERBOSE" = true ] && echo -e "${YELLOW}⚠ Primary model ($MODEL) failed after $MAX_RETRIES attempts. Trying fallback model ($FALLBACK_MODEL)...${NC}" >&2
+    CMD="$BASE_CMD -m $FALLBACK_MODEL"
+
+    # Reset for fallback attempt
+    ATTEMPT=0
+    while [ $ATTEMPT -lt $MAX_RETRIES ] && [ $EXIT_CODE -ne 0 ]; do
+        ATTEMPT=$((ATTEMPT + 1))
+
+        if [ $ATTEMPT -gt 1 ]; then
+            DELAY=$((2 ** (ATTEMPT - 1)))
+            [ "$VERBOSE" = true ] && echo -e "${YELLOW}⚠ Fallback attempt $ATTEMPT/$MAX_RETRIES (waiting ${DELAY}s)...${NC}" >&2
+            sleep $DELAY
+        fi
+
+        if [ "$USE_CACHE" = true ]; then
+            RESPONSE=$(eval "$CMD" '"$FULL_PROMPT"' 2>&1)
+            EXIT_CODE=$?
+            echo "$RESPONSE"
+        else
+            eval "$CMD" '"$FULL_PROMPT"'
+            EXIT_CODE=$?
+        fi
+    done
+
     [ "$VERBOSE" = true ] && [ $EXIT_CODE -eq 0 ] && echo -e "${CYAN}ℹ Response generated using fallback model: $FALLBACK_MODEL${NC}" >&2
 fi
 

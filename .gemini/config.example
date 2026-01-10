@@ -32,6 +32,10 @@
 # Cache directory for responses
 # CACHE_DIR=".gemini/cache"
 
+# Cache time-to-live in seconds (default: 86400 = 24 hours)
+# Set to 0 for infinite cache (until manually cleared)
+# CACHE_TTL=86400
+
 # Auto-invalidate cache when files change (true/false)
 # CACHE_AUTO_INVALIDATE=true
 
