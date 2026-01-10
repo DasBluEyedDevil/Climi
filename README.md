@@ -53,7 +53,7 @@ Claude automatically invokes the skill when it needs large-context analysis. The
 │   ├── roles/                 # Custom expert roles
 │   └── templates/             # Query templates
 ├── GeminiContext.md           # Context injected into every Gemini query
-├── EXAMPLES.md                # Real-world workflow examples
+├── skills/Claude-Code-Integration.md  # Integration guide with examples
 ├── README.md                  # This file
 └── skills/
     ├── gemini.agent.wrapper.sh # Core wrapper script
