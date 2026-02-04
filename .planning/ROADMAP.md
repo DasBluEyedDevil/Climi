@@ -31,11 +31,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Wrapper exits with a clear error message and install instructions if `kimi` CLI is not found
   4. Wrapper warns if Kimi CLI version is below the minimum supported version
   5. User can pass `-m <model>` and `-w <path>` flags through to Kimi CLI
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
+- [ ] 01-01-PLAN.md -- Complete wrapper script with CLI validation, arg parsing, role resolution, invocation, and smoke tests
 
 ### Phase 2: Agent Roles
 **Goal**: Users can delegate to specialized Kimi agents -- reviewers that only read, debuggers that can write and execute -- each with structured output
@@ -123,7 +122,7 @@ Note: Phase 3 (Prompt Assembly) depends only on Phase 1 and can be planned in pa
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Wrapper | 0/TBD | Not started | - |
+| 1. Core Wrapper | 0/1 | Planned | - |
 | 2. Agent Roles | 0/TBD | Not started | - |
 | 3. Prompt Assembly | 0/TBD | Not started | - |
 | 4. Developer Experience | 0/TBD | Not started | - |
