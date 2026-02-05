@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 8 of 11 (MCP Bridge)
-Plan: 4 of 5 in current phase
-Status: In progress
-Last activity: 2026-02-05 — Completed 08-04-PLAN.md
+Plan: 5 of 5 in current phase - **PHASE COMPLETE**
+Status: Phase complete - Ready for Phase 9 (Hooks System)
+Last activity: 2026-02-05 — Completed 08-05-PLAN.md
 
-Progress: [███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 10%
+Progress: [████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 12%
 
 ## Milestones
 
@@ -53,6 +53,9 @@ Key decisions carried forward:
 | 8-04 | Logging to stderr only | Avoid protocol corruption |
 | 8-04 | Single sequential request processing | Simple, predictable behavior |
 | 8-04 | Tool errors return isError=true (not JSON-RPC error) | Distinguish protocol vs tool errors |
+| 8-05 | CLI wrapper locates server via relative path | Works in dev and installed contexts |
+| 8-05 | Setup helper manages ~/.kimi/mcp.json | Kimi CLI MCP client integration |
+| 8-05 | Default config only copied if not exists | Preserve user configuration changes |
 
 ### Pending Todos
 
@@ -64,11 +67,18 @@ None - v2.0 planning in progress.
 
 ## Session Continuity
 
-Last session: 2026-02-05T16:13:26Z
-Stopped at: Completed 08-04-PLAN.md
+Last session: 2026-02-05T16:19:30Z
+Stopped at: Completed 08-05-PLAN.md (Phase 8 complete)
 Resume file: None
 
-**Resumption notes:** Phase 8-04 complete. Main MCP server executable ready with message loop, method dispatch, and integration tests. Next: 08-05 CLI Integration.
+**Resumption notes:** Phase 8 (MCP Bridge) complete. All 5 plans finished:
+- 08-01: MCP Protocol Foundation ✓
+- 08-02: Configuration Management ✓
+- 08-03: Tool Handlers ✓
+- 08-04: Main Server Executable ✓
+- 08-05: CLI Integration ✓
+
+Next: Phase 9 (Hooks System) - auto-delegate coding tasks via git hooks.
 
 ## Archives
 
