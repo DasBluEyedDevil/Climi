@@ -110,12 +110,12 @@ Plans:
   5. User can run `uninstall.sh` and all installed components are cleanly removed
   6. PowerShell shim (`kimi.ps1`) allows Windows users to invoke the wrapper from PowerShell
   7. README.md documents installation, quick start, all roles, architecture overview, and known-good Kimi CLI version
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
-- [ ] 06-03: TBD
+- [ ] 06-01-PLAN.md -- Create install.sh and uninstall.sh with multi-target support
+- [ ] 06-02-PLAN.md -- Create kimi.ps1 PowerShell shim for Windows
+- [ ] 06-03-PLAN.md -- Create comprehensive README.md documentation
 
 ## Progress
 
