@@ -171,7 +171,7 @@
 |-------------|-------|--------|
 | MCP-01 to MCP-08 | Phase 8 | Complete |
 | CONF-09 | Phase 8 | Complete |
-| HOOK-01 to HOOK-09 | Phase 9 | Pending |
+| HOOK-01 to HOOK-09 | Phase 9 | Complete |
 | SKILL-01 to SKILL-08 | Phase 10 | Pending |
 | INT-02 | Phase 10 | Pending |
 | INT-01, INT-03 to INT-08 | Phase 11 | Pending |
