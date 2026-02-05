@@ -165,11 +165,27 @@
 **Requirements:**
 - INT-01: Update install.sh for v2.0
 - INT-03: Update CLAUDE.md with new slash commands
-- INT-04: Create `kimi-mcp.md` slash command
-- INT-05: Create `kimi-hooks.md` slash command
+- INT-04: Create `.claude/commands/kimi-mcp.md` slash command
+- INT-05: Create `.claude/commands/kimi-hooks.md` slash command
 - INT-06: MCP setup guide
 - INT-07: Hooks configuration guide
 - INT-08: Model selection best practices
+
+**Plans:** 4 plans in 2 waves
+
+**Plan List:**
+- [ ] 11-01-PLAN.md — Update install.sh for v2.0 (MCP, hooks, model selection)
+- [ ] 11-02-PLAN.md — Update CLAUDE.md with v2.0 commands and delegation patterns
+- [ ] 11-03-PLAN.md — Create slash commands (/kimi-mcp, /kimi-hooks)
+- [ ] 11-04-PLAN.md — Create documentation guides (MCP, hooks, model selection) and update README
+
+**Status:** Planned (2026-02-05)
+
+**Wave Structure:**
+| Wave | Plans | Description |
+|------|-------|-------------|
+| 1 | 11-01, 11-02 | Installer and CLAUDE.md updates (independent) |
+| 2 | 11-03, 11-04 | Slash commands and documentation (needs 11-02 for command references) |
 
 **Success Criteria:**
 1. install.sh installs all v2.0 components
