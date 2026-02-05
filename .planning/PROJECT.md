@@ -2,100 +2,84 @@
 
 ## What This Is
 
-A Claude Code plugin that integrates Kimi CLI (Kimi Code) as a general-purpose research & development subagent. Claude serves as the Architect and coordinator — deciding strategy, delegating work, and reviewing results. Kimi serves as the autonomous R&D agent — researching, analyzing, writing code, running commands, and executing any delegated task. Replaces a previous Gemini CLI integration (which was limited to read-only analysis) with a broader delegation model powered by Kimi CLI's native agent system.
+A Claude Code plugin that integrates Kimi CLI (Kimi Code) as a general-purpose research & development subagent. Claude serves as the Architect and coordinator — deciding strategy, delegating work, and reviewing results. Kimi serves as the autonomous R&D agent — researching, analyzing, writing code, running commands, and executing any delegated task.
 
 ## Core Value
 
 Claude Code users can delegate any R&D task to Kimi K2.5 via simple slash commands — research, code analysis, implementation, debugging, refactoring — while Claude stays in the architect seat coordinating the work.
 
+## Current State (v1.0 Shipped)
+
+**Shipped:** 2026-02-05
+
+**What's working:**
+- Core wrapper script (`skills/kimi.agent.wrapper.sh`) with CLI detection, version checking, two-tier agent resolution
+- 7 specialized agent roles: reviewer, security, auditor (analysis - read-only), debugger, refactorer, implementer, simplifier (action - full tools)
+- 6 built-in templates: feature, bug, verify, architecture, implement-ready, fix-ready
+- Git diff injection (`--diff`) and context file auto-loading (`.kimi/context.md`)
+- 4 slash commands: `/kimi-analyze`, `/kimi-audit`, `/kimi-trace`, `/kimi-verify`
+- Cross-platform distribution: install.sh, uninstall.sh, PowerShell shim
+- Comprehensive README documentation
+
+**Tech stack:**
+- Bash (wrapper script, installer)
+- PowerShell (Windows shim)
+- YAML (Kimi agent configurations)
+- Markdown (system prompts, templates, documentation)
+
 ## Requirements
 
-### Validated
+### Validated (v1.0)
 
-- ✓ Existing repo structure with install/uninstall scripts — existing
-- ✓ Slash command integration pattern for Claude Code — existing
-- ✓ Role-based analysis (reviewer, debugger, planner, security, etc.) — existing
-- ✓ Template-based queries (feature, bug, verify, architecture) — existing
-- ✓ PowerShell shim for Windows compatibility — existing
-- ✓ Context file injection for project-specific rules — existing
+- ✓ Core wrapper script with CLI validation and role selection — v1.0
+- ✓ Two-tier agent resolution (project-local → global) — v1.0
+- ✓ 7 specialized agent roles with appropriate tool access — v1.0
+- ✓ Template system with 6 built-in templates — v1.0
+- ✓ Git diff injection and context file auto-loading — v1.0
+- ✓ 4 Claude Code slash commands — v1.0
+- ✓ SKILL.md and CLAUDE.md section template — v1.0
+- ✓ Cross-platform installer with backup support — v1.0
+- ✓ PowerShell shim for Windows — v1.0
+- ✓ Comprehensive README documentation — v1.0
 
 ### Active
 
-- [ ] Core wrapper script (`kimi.agent.wrapper.sh`) using Kimi CLI's `--quiet`/`--print` mode for non-interactive analysis
-- [ ] Role system using Kimi's native `--agent-file` (YAML agent definitions with markdown system prompts)
-- [ ] Template system for common query patterns (feature, bug, verify, architecture, implement-ready, fix-ready)
-- [ ] Git diff injection (`--diff` flag to include changed files in analysis context)
-- [ ] Context file injection (`KimiContext.md` auto-loaded into queries)
-- [ ] Slash commands for Claude Code (`/kimi-analyze`, `/kimi-audit`, `/kimi-trace`, `/kimi-verify`)
-- [ ] Installer script that checks for `kimi` CLI, installs agent files, slash commands, and context file
-- [ ] Uninstaller script that cleanly removes all installed components
-- [ ] PowerShell shim (`kimi.ps1`) for Windows users running from PowerShell
-- [ ] Agent files for roles covering both analysis AND action: reviewer, debugger, planner, security, auditor, explainer, migrator, documenter, dependency-mapper, onboarder, api-designer, database-expert, kotlin-expert, typescript-expert, python-expert
-- [ ] Roles grant appropriate tool access: analysis roles get read-only tools, action roles get full tools (shell, file write, etc.)
-- [ ] CLAUDE.md section template for users to add Kimi integration instructions to their projects
-- [ ] README and documentation suitable for public release
+(None — awaiting v2.0 planning)
 
 ### Out of Scope
 
-- Response caching — Kimi CLI handles its own session management; wrapper-level caching adds complexity without clear value
+- Response caching — Kimi CLI handles its own session management
 - Chat session history — Kimi has `--continue`/`--session` natively
 - Batch mode — low usage, adds complexity
-- Token estimation — not reliable across models, users have Kimi's own tooling
-- Smart context search (grep-based file discovery) — Kimi's agent reads the working directory natively
-- Structured output schemas (JSON formatting) — keep output as natural text for Claude consumption
-- Model fallback logic — Kimi handles provider errors; wrapper shouldn't second-guess it
+- Token estimation — not reliable across models
+- Smart context search — Kimi reads the working directory natively
+- Structured output schemas (JSON) — keep output as natural text for Claude
+- Model fallback logic — Kimi handles provider errors
 
 ## Context
 
-**Previous implementation:** Gemini CLI wrapper with ~1060 lines of bash handling roles, templates, caching, chat history, batch mode, smart context, structured output, retry/fallback, and more. Overly complex because Gemini CLI lacked native agent/role support — everything had to be injected via prompt construction.
+**v1.0 shipped:** Full Kimi CLI integration replacing previous Gemini CLI wrapper. Kimi K2.5 offers better code analysis, native agent system (`--agent-file` YAML), and broader delegation model (R&D subagent, not just analyst).
 
-**Why Kimi:** Kimi K2.5 (released Jan 27, 2026) offers better code analysis results than Gemini and a CLI with native agent system (`--agent-file` YAML), `--quiet` mode for clean non-interactive output, built-in variables (`${KIMI_WORK_DIR}`, `${KIMI_NOW}`), and agent inheritance (`extend: default`). Most of what the old wrapper did manually is now handled natively.
-
-**Kimi CLI key interface points:**
-- Non-interactive: `kimi --quiet -p "prompt"` or `kimi --print --final-message-only -p "prompt"`
-- Custom agent: `kimi --agent-file ./agents/reviewer.yaml --quiet -p "prompt"`
-- Model selection: `kimi -m kimi-k2.5 --quiet -p "prompt"` (verify exact model name at implementation time)
-- Working directory: `kimi -w /path/to/project --quiet -p "prompt"`
-- Auto-approve: `--quiet` implies `--yolo`
-- Thinking mode: `--thinking` for deeper analysis
-
-**Agent file format (YAML):**
-```yaml
-version: 1
-agent:
-  extend: default
-  name: reviewer
-  system_prompt_path: ./prompts/reviewer.md
-  exclude_tools:
-    - "kimi_cli.tools.shell:Shell"  # read-only roles don't need shell
-```
-
-**Delegation model:** This is NOT a read-only analysis tool. Kimi is a full R&D subagent:
-- **Analysis roles** (reviewer, auditor, security): Read-only, report findings back to Claude
-- **Action roles** (debugger, migrator, planner): Full tool access, can write code, run commands
-- Claude decides what to delegate, Kimi executes autonomously, Claude reviews the result
-
-**Target audience:** Claude Code users who want a second AI agent for delegated R&D work — research, analysis, implementation, debugging. Should be installable by someone who clones the repo and runs `install.sh`.
+**Target audience:** Claude Code users who want a second AI agent for delegated R&D work.
 
 ## Constraints
 
 - **CLI dependency**: Requires `kimi` CLI installed (`uv tool install kimi-cli`)
-- **Platform**: Must work on Windows (Git Bash + PowerShell), macOS, and Linux
-- **Shell**: Wrapper must be bash-compatible (Git Bash on Windows)
-- **Model versions**: Must verify exact Kimi model names via web search before hardcoding — model naming changes frequently
-- **Agent file paths**: Kimi resolves `system_prompt_path` relative to the agent YAML file location
-- **No Python dependency in wrapper**: The wrapper itself is bash/PowerShell — Kimi CLI is the Python component
+- **Platform**: Works on Windows (Git Bash + PowerShell), macOS, and Linux
+- **Shell**: Wrapper is bash-compatible (Git Bash on Windows)
+- **Agent file paths**: Kimi resolves `system_prompt_path` relative to agent YAML location
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Replace Gemini with Kimi | Better model (K2.5) + better CLI (native agents, --quiet mode) + broader delegation model | — Pending |
-| Kimi as R&D subagent, not just analyst | Previous Gemini integration was read-only "eyes"; Kimi should be a full R&D agent that Claude delegates any task to | — Pending |
-| Use --agent-file for roles | Cleaner than prompt injection, uses Kimi natively, each role is a YAML + markdown pair | — Pending |
-| Fresh approach over 1:1 port | Most Gemini wrapper features are handled natively by Kimi CLI; simpler wrapper is better | — Pending |
-| Minimal feature set | Roles, templates, diff injection, context file. Drop caching/chat/batch/estimation. | — Pending |
-| Published plugin quality | README, installer, clean code — others can use this | — Pending |
+| Replace Gemini with Kimi | Better model (K2.5) + better CLI (native agents, --quiet mode) | ✓ Good |
+| Kimi as R&D subagent, not just analyst | Full delegation model vs read-only analysis | ✓ Good |
+| Use --agent-file for roles | Cleaner than prompt injection, uses Kimi natively | ✓ Good |
+| Exit codes 10-13 for wrapper errors | Distinct from kimi CLI codes (1-9) | ✓ Good |
+| Analysis roles exclude write tools | Security: reviewers can't modify code | ✓ Good |
+| Bash resolution on Windows | Git Bash > WSL > MSYS2 > Cygwin > PATH | ✓ Good |
+| Extended existing install.sh | Supports both Gemini and Kimi integrations | ✓ Good |
 
 ---
-*Last updated: 2026-02-04 after initialization + reframing (Kimi as R&D subagent, not just analyst)*
+*Last updated: 2026-02-05 after v1.0 milestone shipped*
