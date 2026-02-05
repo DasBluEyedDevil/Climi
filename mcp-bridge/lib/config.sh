@@ -94,17 +94,17 @@ mcp_config_load() {
     fi
     
     # Override with environment variables (highest precedence)
-    if [[ -n "${KIMI_MCP_MODEL}" ]]; then
+    if [[ -n "${KIMI_MCP_MODEL:-}" ]]; then
         MCP_CONFIG_MODEL="${KIMI_MCP_MODEL}"
         echo "Overriding model from environment: ${KIMI_MCP_MODEL}" >&2
     fi
-    
-    if [[ -n "${KIMI_MCP_TIMEOUT}" ]]; then
+
+    if [[ -n "${KIMI_MCP_TIMEOUT:-}" ]]; then
         MCP_CONFIG_TIMEOUT="${KIMI_MCP_TIMEOUT}"
         echo "Overriding timeout from environment: ${KIMI_MCP_TIMEOUT}" >&2
     fi
-    
-    if [[ -n "${KIMI_MCP_MAX_FILE_SIZE}" ]]; then
+
+    if [[ -n "${KIMI_MCP_MAX_FILE_SIZE:-}" ]]; then
         MCP_CONFIG_MAX_FILE_SIZE="${KIMI_MCP_MAX_FILE_SIZE}"
         echo "Overriding max_file_size from environment: ${KIMI_MCP_MAX_FILE_SIZE}" >&2
     fi
