@@ -29,7 +29,7 @@ Progress: [#####.....] 42%
 |-------|-------|-------|----------|
 | 01-core-wrapper | 1/1 | ~6 min | ~6 min |
 | 02-agent-roles | 3/3 | ~20 min | ~6.7 min |
-| 03-prompt-assembly | 1/TBD | ~4 min | ~4 min |
+| 03-prompt-assembly | 2/2 | ~7 min | ~3.5 min |
 
 **Recent Trend:**
 - Last 5 plans: 01-01 (~6 min), 02-01 (~8 min), 02-02 (~7 min), 02-03 (~5 min)
@@ -65,6 +65,11 @@ Recent decisions affecting current work:
 - [03-01]: Template variables use Kimi CLI native syntax: ${KIMI_WORK_DIR}, ${KIMI_NOW}, ${KIMI_MODEL}
 - [03-01]: Exit code 14 added for template not found (consistent with role not found pattern)
 - [03-01]: Machine-parseable header extended to [kimi:role:template:model]
+- [03-02]: Git diff injection uses `git diff HEAD` for staged + unstaged changes
+- [03-02]: Git errors (unavailable, not a repo) show warning but continue execution
+- [03-02]: Context file search order: .kimi/context.md first, KimiContext.md as fallback
+- [03-02]: Missing context file silently continues (no error, no warning)
+- [03-02]: Prompt assembly order: Template → Context → Diff → User prompt
 
 ### Pending Todos
 
@@ -78,8 +83,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-05T03:06:56Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-02-05T03:07:20Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
 
-**Resumption notes:** Phase 3 plan 1 complete. Templates implemented with -t flag support.
+**Resumption notes:** Phase 3 plans 1 and 2 complete. Templates, --diff flag, and context file support all implemented.
