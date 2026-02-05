@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 10 of 11 (Enhanced SKILL.md)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-05 — Completed 10-01-PLAN.md
+Last activity: 2026-02-05 — Completed 10-02-PLAN.md
 
-Progress: [█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░] 38%
+Progress: [██████████████░░░░░░░░░░░░░░░░░░░░░░░░░░] 40%
 
 ## Milestones
 
@@ -84,6 +84,9 @@ Key decisions carried forward:
 | 10-01 | Test files (*.test.*, *.spec.*) force K2 | Tests are routine, not creative work |
 | 10-01 | Component files (*component*) boost K2.5 score | Component creation is creative work |
 | 10-01 | Default confidence threshold: 75% | Balances automation with accuracy |
+| 10-02 | Confidence formula: 50 base + 20 (files agree) + 20 (task clear) + 10 (patterns match) | Multi-factor scoring reflects signal strength |
+| 10-02 | Tie-breaker defaults to K2 | Cost efficiency when signals are balanced |
+| 10-02 | KIMI_FORCE_MODEL takes absolute precedence | User control over automatic selection |
 
 ### Pending Todos
 
@@ -95,14 +98,15 @@ None - v2.0 planning in progress.
 
 ## Session Continuity
 
-Last session: 2026-02-05T18:00:53Z
-Stopped at: Completed 10-01-PLAN.md (Phase 10, Plan 1)
+Last session: 2026-02-05T18:20:00Z
+Stopped at: Completed 10-02-PLAN.md (Phase 10, Plan 2)
 Resume file: None
 
-**Resumption notes:** Phase 10 (Enhanced SKILL.md) **IN PROGRESS**. Plan 1 complete:
+**Resumption notes:** Phase 10 (Enhanced SKILL.md) **IN PROGRESS**. Plans 1-2 complete:
 - 10-01: Configuration and Classification ✓ (model-rules.json, task-classifier.sh)
+- 10-02: Model Selection Engine ✓ (kimi-model-selector.sh with confidence scoring)
 
-Next: Plan 10-02 - Model Selection Engine with confidence scoring
+Next: Plan 10-03 - Integration with wrapper script
 
 ## Archives
 
