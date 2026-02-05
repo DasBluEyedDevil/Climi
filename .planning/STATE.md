@@ -5,44 +5,25 @@
 See: .planning/PROJECT.md (updated 2026-02-05)
 
 **Core value:** Claude Code users can delegate any R&D task to Kimi K2.5 -- research, analysis, implementation, debugging, refactoring -- while Claude stays in the architect seat.
-**Current focus:** v1.0 SHIPPED - Ready for next milestone
+**Current focus:** v2.0 Autonomous Delegation — MCP Bridge, Hooks System, Enhanced SKILL.md
 
 ## Current Position
 
-Phase: 7 of 7 (v1.0 complete)
-Plan: All complete
-Status: MILESTONE SHIPPED
-Last activity: 2026-02-05 -- v1.0 milestone complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-02-05 — Milestone v2.0 started
 
-Progress: [########################################] 100%
+Progress: [########################################] 0%
 
 ## Milestones
 
 | Version | Status | Phases | Plans | Shipped |
 |---------|--------|--------|-------|---------|
 | v1.0 MVP | SHIPPED | 1-7 | 15 | 2026-02-05 |
-| v2.0 | Planned | TBD | TBD | - |
+| v2.0 | In Progress | TBD | TBD | - |
 
 See: .planning/MILESTONES.md for details
-
-## Performance Metrics (v1.0)
-
-**Velocity:**
-- Total plans completed: 15
-- Average duration: ~3 minutes
-- Total execution time: ~44 minutes
-
-**By Phase:**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 01-core-wrapper | 1/1 | ~6 min | ~6 min |
-| 02-agent-roles | 3/3 | ~20 min | ~6.7 min |
-| 03-prompt-assembly | 3/3 | ~10 min | ~3.3 min |
-| 04-developer-experience | 2/2 | ~5 min | ~2.5 min |
-| 05-claude-code-integration | 2/2 | ~5 min | ~2.5 min |
-| 06-distribution | 3/3 | ~9 min | ~3 min |
-| 07-fix-installer-agent-md | 1/1 | ~1 min | ~1 min |
 
 ## Accumulated Context
 
@@ -57,21 +38,22 @@ Key decisions carried forward:
 
 ### Pending Todos
 
-None - v1.0 complete.
+None - v2.0 planning in progress.
 
 ### Blockers/Concerns
 
-None - all v1.0 concerns addressed.
+None - awaiting requirements definition.
 
 ## Session Continuity
 
-Last session: 2026-02-05T04:45:00Z
-Stopped at: v1.0 MILESTONE COMPLETE
+Last session: 2026-02-05T05:00:00Z
+Stopped at: Started v2.0 milestone planning
 Resume file: None
 
-**Resumption notes:** v1.0 shipped! Next steps:
-1. `/gsd-new-milestone` to plan v2.0
-2. Or push to GitHub and announce
+**Resumption notes:** v2.0 milestone initialized. Next steps:
+1. Define requirements for MCP Bridge, Hooks System, Enhanced SKILL.md
+2. Create roadmap with phases
+3. Begin execution with `/gsd-plan-phase [N]`
 
 ## Archives
 

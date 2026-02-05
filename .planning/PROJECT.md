@@ -8,6 +8,16 @@ A Claude Code plugin that integrates Kimi CLI (Kimi Code) as a general-purpose r
 
 Claude Code users can delegate any R&D task to Kimi K2.5 via simple slash commands — research, code analysis, implementation, debugging, refactoring — while Claude stays in the architect seat coordinating the work.
 
+## Current Milestone: v2.0 Autonomous Delegation
+
+**Goal:** Enable aggressive autonomous delegation by exposing Kimi as MCP tools and auto-invoking it for hands-on coding tasks, preserving Claude Code tokens for architecture and coordination.
+
+**Target features:**
+- MCP Bridge: Kimi exposed as callable MCP tools for external AI systems
+- Hooks System: Predefined git hooks and editor hooks that auto-delegate coding tasks to Kimi
+- Enhanced SKILL.md: Smarter trigger patterns for automatic delegation
+- Flexible Configuration: Install hooks per-project or globally based on user choice
+
 ## Current State (v1.0 Shipped)
 
 **Shipped:** 2026-02-05
@@ -44,7 +54,10 @@ Claude Code users can delegate any R&D task to Kimi K2.5 via simple slash comman
 
 ### Active
 
-(None — awaiting v2.0 planning)
+- [ ] MCP Bridge: Expose Kimi as callable MCP tools for external systems — v2.0
+- [ ] Hooks System: Auto-delegate hands-on coding tasks to Kimi with predefined hooks — v2.0
+- [ ] Enhanced SKILL.md: Smarter triggers for autonomous delegation to preserve Claude tokens — v2.0
+- [ ] Configuration: Per-project or global hook installation — v2.0
 
 ### Out of Scope
 
@@ -82,4 +95,4 @@ Claude Code users can delegate any R&D task to Kimi K2.5 via simple slash comman
 | Extended existing install.sh | Supports both Gemini and Kimi integrations | ✓ Good |
 
 ---
-*Last updated: 2026-02-05 after v1.0 milestone shipped*
+*Last updated: 2026-02-05 after v2.0 milestone started*
