@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 ## Current Position
 
-Phase: 9 of 11 (Hooks System) - **VERIFIED ✓**
-Plan: 4 of 4 executed and verified
-Status: Phase verified - Ready for Phase 10 (Enhanced SKILL.md)
-Last activity: 2026-02-05 — Phase 9 verified, all 21 must-haves passed
+Phase: 10 of 11 (Enhanced SKILL.md)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-05 — Completed 10-01-PLAN.md
 
-Progress: [████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 36%
+Progress: [█████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░] 38%
 
 ## Milestones
 
@@ -76,6 +76,15 @@ Key decisions carried forward:
 | 9-04 | Follow MCP bridge pattern for hooks installation | Consistency across components |
 | 9-04 | Added logging abstraction for installer feedback | Cleaner code, consistent output |
 
+**v2.0 Phase 10 decisions:**
+| Phase | Decision | Rationale |
+|-------|----------|-----------|
+| 10-01 | K2 for backend files (.py, .js, .go, .rs, etc.) | Routine tasks need fast, efficient model |
+| 10-01 | K2.5 for UI files (.tsx, .jsx, .css, .vue, etc.) | Creative/UI tasks benefit from stronger model |
+| 10-01 | Test files (*.test.*, *.spec.*) force K2 | Tests are routine, not creative work |
+| 10-01 | Component files (*component*) boost K2.5 score | Component creation is creative work |
+| 10-01 | Default confidence threshold: 75% | Balances automation with accuracy |
+
 ### Pending Todos
 
 None - v2.0 planning in progress.
@@ -86,17 +95,14 @@ None - v2.0 planning in progress.
 
 ## Session Continuity
 
-Last session: 2026-02-05T17:04:24Z
-Stopped at: Completed 09-04-PLAN.md (Phase 9, Plan 4) - awaiting checkpoint verification
+Last session: 2026-02-05T18:00:53Z
+Stopped at: Completed 10-01-PLAN.md (Phase 10, Plan 1)
 Resume file: None
 
-**Resumption notes:** Phase 9 (Hooks System) **COMPLETE**. All plans done:
-- 09-01: Hooks Configuration System ✓ (default.json, hooks-config.sh, test suite)
-- 09-02: Hook Scripts ✓ (hooks-common.sh, pre-commit, post-checkout, pre-push)
-- 09-03: Hook Installer ✓ (hooks/lib/install.sh, bin/kimi-hooks-setup, bin/kimi-hooks)
-- 09-04: Integration ✓ (install.sh updated, hooks/README.md created)
+**Resumption notes:** Phase 10 (Enhanced SKILL.md) **IN PROGRESS**. Plan 1 complete:
+- 10-01: Configuration and Classification ✓ (model-rules.json, task-classifier.sh)
 
-Next: Phase 10 - Enhanced SKILL.md with smart triggers and model tiering.
+Next: Plan 10-02 - Model Selection Engine with confidence scoring
 
 ## Archives
 
