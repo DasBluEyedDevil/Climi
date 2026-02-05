@@ -166,6 +166,19 @@ check_kimi_version() {
     return 0
 }
 
+# Logging functions
+log_info() {
+    echo -e "${BLUE}$1${NC}"
+}
+
+log_success() {
+    echo -e "${GREEN}$1${NC}"
+}
+
+log_warn() {
+    echo -e "${YELLOW}$1${NC}"
+}
+
 echo -e "${GREEN}╔════════════════════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║   Multi-Agent-Workflow Installer v${SCRIPT_VERSION}               ║${NC}"
 echo -e "${GREEN}║   Gemini Research + Kimi Delegation for Claude Code    ║${NC}"
@@ -553,8 +566,72 @@ install_mcp_bridge() {
     fi
 }
 
+# -- Hooks System Installation --
+
+install_hooks() {
+    log_info "Installing hooks system..."
+    
+    local hooks_dir="${SCRIPT_DIR}/hooks"
+    
+    if [[ ! -d "$hooks_dir" ]]; then
+        log_warn "Hooks directory not found: $hooks_dir"
+        log_warn "Skipping hooks installation"
+        return 0
+    fi
+    
+    # Create hooks directories
+    mkdir -p "$TARGET_DIR/hooks/config"
+    mkdir -p "$TARGET_DIR/hooks/lib"
+    mkdir -p "$TARGET_DIR/hooks/hooks"
+    
+    # Copy config files
+    cp "$hooks_dir/config/default.json" "$TARGET_DIR/hooks/config/"
+    
+    # Copy library files
+    cp "$hooks_dir/lib/hooks-config.sh" "$TARGET_DIR/hooks/lib/"
+    cp "$hooks_dir/lib/hooks-common.sh" "$TARGET_DIR/hooks/lib/"
+    cp "$hooks_dir/lib/install.sh" "$TARGET_DIR/hooks/lib/"
+    
+    # Copy hook scripts
+    cp "$hooks_dir/hooks/pre-commit" "$TARGET_DIR/hooks/hooks/"
+    cp "$hooks_dir/hooks/post-checkout" "$TARGET_DIR/hooks/hooks/"
+    cp "$hooks_dir/hooks/pre-push" "$TARGET_DIR/hooks/hooks/"
+    
+    # Make scripts executable
+    chmod +x "$TARGET_DIR/hooks/hooks/pre-commit"
+    chmod +x "$TARGET_DIR/hooks/hooks/post-checkout"
+    chmod +x "$TARGET_DIR/hooks/hooks/pre-push"
+    
+    # Create user config directory
+    mkdir -p "$HOME/.config/kimi"
+    
+    # Copy default user config if doesn't exist
+    if [[ ! -f "$HOME/.config/kimi/hooks.json" ]]; then
+        cp "$hooks_dir/config/default.json" "$HOME/.config/kimi/hooks.json"
+        log_info "Created default hooks config: ~/.config/kimi/hooks.json"
+    fi
+    
+    # Copy CLI tools
+    mkdir -p "$TARGET_DIR/bin"
+    if [ -f "$SCRIPT_DIR/bin/kimi-hooks" ]; then
+        cp "$SCRIPT_DIR/bin/kimi-hooks" "$TARGET_DIR/bin/"
+        chmod +x "$TARGET_DIR/bin/kimi-hooks"
+    fi
+    if [ -f "$SCRIPT_DIR/bin/kimi-hooks-setup" ]; then
+        cp "$SCRIPT_DIR/bin/kimi-hooks-setup" "$TARGET_DIR/bin/"
+        chmod +x "$TARGET_DIR/bin/kimi-hooks-setup"
+    fi
+    
+    log_success "Hooks system installed"
+    log_info "  Config: ~/.config/kimi/hooks.json"
+    log_info "  Run: kimi-hooks install --local (or --global)"
+}
+
 # Install MCP Bridge
 install_mcp_bridge
+
+# Install Hooks System
+install_hooks
 
 # -- Shared Components --
 
