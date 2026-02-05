@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-04)
 
 ## Current Position
 
-Phase: 2 of 6 (Agent Roles) - COMPLETE
-Plan: 3 of 3 completed
-Status: Phase complete - ready for Phase 3: Prompt Assembly
-Last activity: 2026-02-04 -- Phase 2 verified (5/5 must-haves passed)
+Phase: 3 of 6 (Prompt Assembly) - IN PROGRESS
+Plan: 2 of 2 completed
+Status: Git diff injection and context file auto-loading implemented
+Last activity: 2026-02-05 -- Completed 03-02-PLAN.md (--diff flag + context file support)
 
-Progress: [####......] 33%
+Progress: [#####.....] 42%
 
 ## Performance Metrics
 
@@ -29,6 +29,7 @@ Progress: [####......] 33%
 |-------|-------|-------|----------|
 | 01-core-wrapper | 1/1 | ~6 min | ~6 min |
 | 02-agent-roles | 3/3 | ~20 min | ~6.7 min |
+| 03-prompt-assembly | 1/TBD | ~4 min | ~4 min |
 
 **Recent Trend:**
 - Last 5 plans: 01-01 (~6 min), 02-01 (~8 min), 02-02 (~7 min), 02-03 (~5 min)
@@ -60,6 +61,10 @@ Recent decisions affecting current work:
 - [02-02]: Implementer role has greenfield freedom: can introduce new patterns regardless of existing conventions
 - [02-02]: All 7 agent roles (3 analysis + 4 action) are now complete and ready for integration
 - [02-03]: All 7 agents verified: YAML valid, loadable via kimi CLI, correct tool restrictions, structured output confirmed
+- [03-01]: Template structure follows Context-Task-Output Format-Constraints sections
+- [03-01]: Template variables use Kimi CLI native syntax: ${KIMI_WORK_DIR}, ${KIMI_NOW}, ${KIMI_MODEL}
+- [03-01]: Exit code 14 added for template not found (consistent with role not found pattern)
+- [03-01]: Machine-parseable header extended to [kimi:role:template:model]
 
 ### Pending Todos
 
@@ -73,6 +78,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-04T22:20:00Z
-Stopped at: Completed 02-03-PLAN.md (agent verification) - Phase 2 complete, ready for Phase 3
+Last session: 2026-02-05T03:06:56Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
+
+**Resumption notes:** Phase 3 plan 1 complete. Templates implemented with -t flag support.

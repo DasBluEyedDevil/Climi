@@ -65,7 +65,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 03-01: TBD
+- [x] 03-01-PLAN.md -- Template-based prompt prepending with 6 built-in templates (feature, bug, verify, architecture, implement-ready, fix-ready)
 
 ### Phase 4: Developer Experience
 **Goal**: Users can debug wrapper behavior, preview commands, access help, and activate deep thinking mode
@@ -125,7 +125,7 @@ Note: Phase 3 (Prompt Assembly) depends only on Phase 1 and can be planned in pa
 |-------|----------------|--------|-----------|
 | 1. Core Wrapper | 1/1 | Complete | 2026-02-04 |
 | 2. Agent Roles | 3/3 | Complete | 2026-02-04 |
-| 3. Prompt Assembly | 0/TBD | Not started | - |
+| 3. Prompt Assembly | 1/TBD | In progress | - |
 | 4. Developer Experience | 0/TBD | Not started | - |
 | 5. Claude Code Integration | 0/TBD | Not started | - |
 | 6. Distribution | 0/TBD | Not started | - |
