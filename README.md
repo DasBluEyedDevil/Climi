@@ -1,4 +1,4 @@
-# Multi-Agent-Workflow: Kimi Integration for Claude Code
+# Multi-Agent-Workflow: Kimi Integration for Claude Code v2.0
 
 [![Kimi CLI](https://img.shields.io/badge/Kimi%20CLI-%E2%89%A51.7.0-blue)]()
 [![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows-green)]()
@@ -7,6 +7,14 @@
 ## Overview
 
 Integrate **Kimi K2.5** as an autonomous R&D subagent for Claude Code. **Claude is the Brain** (architect, coordinator, reviewer) and **Kimi is the Hands** (developer, implementer, debugger). Claude designs and delegates; Kimi implements and executes.
+
+## What's New in v2.0
+
+- **MCP Server:** Expose Kimi as callable tools for external AI systems
+- **Git Hooks:** Auto-delegate coding tasks on commit/push/checkout
+- **Model Selection:** Intelligent K2 vs K2.5 selection based on task type
+- **Cost Estimation:** Preview token costs before delegation
+- **Slash Commands:** New `/kimi-mcp` and `/kimi-hooks` commands
 
 **Division of Labor:**
 
@@ -22,20 +30,46 @@ Integrate **Kimi K2.5** as an autonomous R&D subagent for Claude Code. **Claude 
 - 7 specialized agent roles: 4 action roles (full tool access) + 3 analysis roles (read-only)
 - Template-based prompts for common workflows
 - Git diff injection for post-change verification
+- **v2.0:** MCP bridge for external AI integration
+- **v2.0:** Git hooks for automated delegation
+- **v2.0:** Smart model selection (K2 vs K2.5)
 
 ## Quick Start
+
+### 1. Install
 
 ```bash
 # Clone and install
 git clone https://github.com/username/multi-agent-workflow.git
 cd multi-agent-workflow
+
+# Standard install (v1.0 features)
 ./install.sh
 
-# Test it works
+# Full v2.0 install (with MCP + hooks)
+./install.sh --with-hooks
+```
+
+### 2. Configure MCP (Optional)
+
+```bash
+# Set up MCP for Claude Code integration
+kimi-mcp setup --claude
+```
+
+### 3. Use
+
+```bash
+# Basic usage
 ./skills/kimi.agent.wrapper.sh -r reviewer "Review this codebase"
 
-# With thinking mode for deeper analysis
+# With thinking mode
 ./skills/kimi.agent.wrapper.sh -r reviewer --thinking "Explain the architecture"
+
+# Slash commands in Claude Code
+/kimi-analyze src/ "How is auth implemented?"
+/kimi-mcp start
+/kimi-hooks install
 ```
 
 ## Installation
@@ -46,8 +80,11 @@ cd multi-agent-workflow
 |------------|----------|--------------|
 | **Kimi CLI** | Yes (>=1.7.0) | `uv tool install kimi-cli` or `pip install kimi-cli` |
 | **Bash** | Yes | macOS/Linux: built-in, Windows: Git Bash |
+| **jq** | Yes (v2.0) | `brew install jq` or `apt-get install jq` |
 | **Git** | Optional | For `--diff` feature |
 | **Python** | Yes (>=3.12) | Required by Kimi CLI |
+
+**Note:** jq is required for MCP server and hooks functionality in v2.0.
 
 ### Install Options
 
@@ -60,6 +97,12 @@ cd multi-agent-workflow
 
 # Local install (current directory only)
 ./install.sh --local
+
+# Full v2.0 install (with MCP + hooks)
+./install.sh --with-hooks
+
+# Dry run (preview what will be installed)
+./install.sh --dry-run
 
 # Custom target
 ./install.sh --target /path/to/target
@@ -79,6 +122,15 @@ bash skills/kimi.agent.wrapper.sh -r reviewer "Review this code"
 
 The PowerShell shim (`kimi.ps1`) automatically finds Git Bash, WSL, or MSYS2 to execute the bash wrapper.
 
+### PATH Configuration
+
+Ensure `~/.local/bin` is in your PATH for v2.0 commands:
+
+```bash
+# Add to ~/.bashrc or ~/.zshrc
+export PATH="$HOME/.local/bin:$PATH"
+```
+
 ### Upgrading
 
 Run `./install.sh` again. The installer:
@@ -86,6 +138,7 @@ Run `./install.sh` again. The installer:
 - Offers to create timestamped backups
 - Updates wrapper scripts, roles, templates
 - Preserves your custom configurations
+- Installs new v2.0 components alongside v1.0
 
 ### Uninstalling
 
@@ -217,6 +270,8 @@ When installed, these slash commands are available in Claude Code:
 | `/kimi-audit` | auditor | Architecture and quality audit |
 | `/kimi-trace` | debugger | Bug tracing with full tool access |
 | `/kimi-verify` | (template) | Post-change verification with diff |
+| `/kimi-mcp` | - | MCP server management (v2.0) |
+| `/kimi-hooks` | - | Git hooks management (v2.0) |
 
 ### Usage in Claude Code
 
@@ -225,7 +280,27 @@ When installed, these slash commands are available in Claude Code:
 /kimi-audit . What patterns need improvement?
 /kimi-trace "Error at auth.ts:145"
 /kimi-verify Check my changes are correct
+/kimi-mcp start
+/kimi-hooks install
 ```
+
+## Documentation
+
+- [MCP Setup Guide](docs/MCP-SETUP.md) — Configure MCP server
+- [Hooks Guide](docs/HOOKS-GUIDE.md) — Git hooks configuration
+- [Model Selection](docs/MODEL-SELECTION.md) — K2 vs K2.5 guide
+- [Claude Integration](.claude/CLAUDE.md) — Complete command reference
+
+## Migrating from v1.0
+
+v2.0 is backward compatible. Existing installations continue working.
+
+To upgrade:
+```bash
+./install.sh  # Installs new components alongside existing
+```
+
+New components are additive — your existing workflow remains unchanged.
 
 ## Configuration
 
@@ -314,8 +389,18 @@ multi-agent-workflow/
 +-- uninstall.sh                    # Clean uninstaller
 +-- kimi.ps1                        # PowerShell shim (Windows)
 |
++-- docs/                           # v2.0 Documentation
+|   +-- MCP-SETUP.md                # MCP server setup guide
+|   +-- HOOKS-GUIDE.md              # Git hooks configuration
+|   +-- MODEL-SELECTION.md          # K2 vs K2.5 guide
+|
 +-- skills/
 |   +-- kimi.agent.wrapper.sh       # Core wrapper script
+|   +-- kimi-mcp-server.sh          # MCP server (v2.0)
+|   +-- kimi-mcp.sh                 # MCP CLI wrapper (v2.0)
+|   +-- kimi-hooks.sh               # Hooks manager (v2.0)
+|   +-- kimi-hooks-setup.sh         # Hooks installer (v2.0)
+|   +-- kimi-model-selector.sh      # Model selector (v2.0)
 |   +-- Claude-Code-Integration.md  # Integration guide
 |
 +-- .kimi/
@@ -328,12 +413,17 @@ multi-agent-workflow/
 |   |   +-- implementer.yaml + .md
 |   |   +-- simplifier.yaml + .md
 |   +-- templates/                  # 6 query templates
-|       +-- feature.md
-|       +-- bug.md
-|       +-- verify.md
-|       +-- architecture.md
-|       +-- implement-ready.md
-|       +-- fix-ready.md
+|   |   +-- feature.md
+|   |   +-- bug.md
+|   |   +-- verify.md
+|   |   +-- architecture.md
+|   |   +-- implement-ready.md
+|   |   +-- fix-ready.md
+|   +-- hooks/                      # Git hooks (v2.0)
+|   |   +-- pre-commit
+|   |   +-- post-checkout
+|   |   +-- pre-push
+|   |   +-- lib.sh                  # Shared hook library
 |
 +-- .claude/
     +-- commands/kimi/              # Slash commands
@@ -341,6 +431,8 @@ multi-agent-workflow/
     |   +-- kimi-audit.md
     |   +-- kimi-trace.md
     |   +-- kimi-verify.md
+    |   +-- kimi-mcp.md             # v2.0
+    |   +-- kimi-hooks.md           # v2.0
     +-- skills/kimi-delegation/
     |   +-- SKILL.md                # Claude skill definition
     +-- CLAUDE.md.kimi-section      # Config template
@@ -382,6 +474,32 @@ kimi --version
 
 # If PATH issues persist (common on Windows), set KIMI_PATH:
 export KIMI_PATH=/path/to/kimi
+```
+
+### "jq: command not found" (v2.0)
+
+```bash
+# macOS
+brew install jq
+
+# Ubuntu/Debian
+sudo apt-get install jq
+
+# Windows (Git Bash)
+choco install jq
+```
+
+### MCP/hooks commands not found
+
+```bash
+# Check if ~/.local/bin is in PATH
+echo $PATH | grep ".local/bin"
+
+# Add to PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# Re-run installer
+./install.sh
 ```
 
 ### "role not found"
@@ -426,6 +544,7 @@ pip install --upgrade kimi-cli
 |-----------|-----------------|-------|
 | **Kimi CLI** | >= 1.7.0 | `--quiet`, `--agent-file` support |
 | **Bash** | Any modern | Git Bash on Windows |
+| **jq** | >= 1.6 | Required for MCP/hooks (v2.0) |
 | **Python** | >= 3.12 | Required by Kimi CLI |
 | **Git** | Any | Optional, for `--diff` feature |
 | **OS** | macOS, Linux, Windows | Windows via WSL/Git Bash |
