@@ -8,36 +8,36 @@ A Claude Code plugin that integrates Kimi CLI (Kimi Code) as a general-purpose r
 
 Claude Code users can delegate any R&D task to Kimi K2.5 via simple slash commands — research, code analysis, implementation, debugging, refactoring — while Claude stays in the architect seat coordinating the work.
 
-## Current Milestone: v2.0 Autonomous Delegation
-
-**Goal:** Enable aggressive autonomous delegation by exposing Kimi as MCP tools and auto-invoking it for hands-on coding tasks, preserving Claude Code tokens for architecture and coordination.
-
-**Target features:**
-- MCP Bridge: Kimi exposed as callable MCP tools for external AI systems
-- Hooks System: Predefined git hooks and editor hooks that auto-delegate coding tasks to Kimi
-- Enhanced SKILL.md: Smarter trigger patterns for automatic delegation
-- Flexible Configuration: Install hooks per-project or globally based on user choice
-
-## Current State (v1.0 Shipped)
+## Current State (v2.0 Shipped)
 
 **Shipped:** 2026-02-05
 
 **What's working:**
-- Core wrapper script (`skills/kimi.agent.wrapper.sh`) with CLI detection, version checking, two-tier agent resolution
-- 7 specialized agent roles: reviewer, security, auditor (analysis - read-only), debugger, refactorer, implementer, simplifier (action - full tools)
-- 6 built-in templates: feature, bug, verify, architecture, implement-ready, fix-ready
-- Git diff injection (`--diff`) and context file auto-loading (`.kimi/context.md`)
-- 4 slash commands: `/kimi-analyze`, `/kimi-audit`, `/kimi-trace`, `/kimi-verify`
-- Cross-platform distribution: install.sh, uninstall.sh, PowerShell shim
-- Comprehensive README documentation
+- MCP Bridge: Kimi exposed as 4 callable MCP tools (analyze, implement, refactor, verify) via JSON-RPC protocol
+- Hooks System: Git pre-commit, post-checkout, and pre-push hooks auto-delegate coding tasks to Kimi
+- Intelligent Model Selection: Automatic K2 vs K2.5 selection based on file types and task classification
+- Cost Estimation: Token and cost estimation before delegation with configurable confidence thresholds
+- Flexible Configuration: Global (~/.config/) and per-project (.kimi/) configuration with clear precedence rules
+- Enhanced Documentation: Complete guides for MCP setup, hooks configuration, and model selection best practices
+- All v1.0 features preserved: wrapper script, 7 agent roles, 6 templates, 4 slash commands, cross-platform installer
 
 **Tech stack:**
-- Bash (wrapper script, installer)
+- Bash (wrapper script, MCP server, hooks, installer)
 - PowerShell (Windows shim)
 - YAML (Kimi agent configurations)
 - Markdown (system prompts, templates, documentation)
+- JSON (MCP protocol, configuration files)
 
 ## Requirements
+
+### Validated (v2.0)
+
+- ✓ MCP Bridge: Kimi exposed as callable MCP tools for external systems — v2.0
+- ✓ Hooks System: Auto-delegate hands-on coding tasks to Kimi with predefined hooks — v2.0
+- ✓ Enhanced SKILL.md: Smarter triggers for autonomous delegation to preserve Claude tokens — v2.0
+- ✓ Configuration: Per-project or global hook installation — v2.0
+- ✓ Intelligent Model Selection: Automatic K2 vs K2.5 based on file type and task — v2.0
+- ✓ Cost Estimation: Token and cost estimates before delegation — v2.0
 
 ### Validated (v1.0)
 
@@ -54,10 +54,12 @@ Claude Code users can delegate any R&D task to Kimi K2.5 via simple slash comman
 
 ### Active
 
-- [ ] MCP Bridge: Expose Kimi as callable MCP tools for external systems — v2.0
-- [ ] Hooks System: Auto-delegate hands-on coding tasks to Kimi with predefined hooks — v2.0
-- [ ] Enhanced SKILL.md: Smarter triggers for autonomous delegation to preserve Claude tokens — v2.0
-- [ ] Configuration: Per-project or global hook installation — v2.0
+- [ ] Custom hook creation API — v3.0
+- [ ] IDE integration hooks (VSCode, IntelliJ) — v3.0
+- [ ] CI/CD pipeline hooks — v3.0
+- [ ] Streaming responses for long-running tasks — v3.0
+- [ ] Multi-tool orchestration (chain Kimi calls) — v3.0
+- [ ] Learn from user corrections to improve auto-delegation — v3.0
 
 ### Out of Scope
 
@@ -68,12 +70,20 @@ Claude Code users can delegate any R&D task to Kimi K2.5 via simple slash comman
 - Smart context search — Kimi reads the working directory natively
 - Structured output schemas (JSON) — keep output as natural text for Claude
 - Model fallback logic — Kimi handles provider errors
+- Real-time collaboration — requires significant infrastructure
+- Web UI for configuration — CLI-first approach
+- Multi-user support — single-user developer tool
+- Cloud-hosted MCP server — local-first design
+- Token usage analytics — nice-to-have; focus on core features
+- Hook marketplace/sharing — premature; establish core hooks first
 
 ## Context
 
+**v2.0 shipped:** Full autonomous delegation system with MCP Bridge, Hooks System, and intelligent model selection. The system now automatically delegates routine coding tasks (refactoring, tests) to K2 and creative/UI tasks to K2.5, preserving Claude Code tokens for architecture and coordination.
+
 **v1.0 shipped:** Full Kimi CLI integration replacing previous Gemini CLI wrapper. Kimi K2.5 offers better code analysis, native agent system (`--agent-file` YAML), and broader delegation model (R&D subagent, not just analyst).
 
-**Target audience:** Claude Code users who want a second AI agent for delegated R&D work.
+**Target audience:** Claude Code users who want a second AI agent for delegated R&D work with automatic delegation for hands-on coding tasks.
 
 ## Constraints
 
@@ -81,6 +91,8 @@ Claude Code users can delegate any R&D task to Kimi K2.5 via simple slash comman
 - **Platform**: Works on Windows (Git Bash + PowerShell), macOS, and Linux
 - **Shell**: Wrapper is bash-compatible (Git Bash on Windows)
 - **Agent file paths**: Kimi resolves `system_prompt_path` relative to agent YAML location
+- **jq dependency**: Required for MCP server (JSON processing)
+- **Git**: Hooks require Git 2.9+ for core.hooksPath support
 
 ## Key Decisions
 
@@ -93,6 +105,11 @@ Claude Code users can delegate any R&D task to Kimi K2.5 via simple slash comman
 | Analysis roles exclude write tools | Security: reviewers can't modify code | ✓ Good |
 | Bash resolution on Windows | Git Bash > WSL > MSYS2 > Cygwin > PATH | ✓ Good |
 | Extended existing install.sh | Supports both Gemini and Kimi integrations | ✓ Good |
+| Pure Bash MCP implementation | Minimize dependencies for CLI integration | ✓ Good |
+| Configuration precedence: env > user > defaults | Flexible deployment and local customization | ✓ Good |
+| K2 for backend, K2.5 for UI files | Routine vs creative task optimization | ✓ Good |
+| auto_model defaults to false | Backward compatibility preserved | ✓ Good |
+| v2.0 features are additive | No breaking changes for existing users | ✓ Good |
 
 ---
-*Last updated: 2026-02-05 after v2.0 milestone started*
+*Last updated: 2026-02-05 after v2.0 milestone completion*
