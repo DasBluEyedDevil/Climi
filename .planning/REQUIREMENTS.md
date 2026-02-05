@@ -118,17 +118,17 @@ Each role is a YAML agent file + markdown system prompt:
 | WRAP-13 | Phase 1 | Pending |
 | WRAP-14 | Phase 4 | Pending |
 | WRAP-15 | Phase 4 | Pending |
-| ROLE-01 | Phase 2 | Pending |
-| ROLE-02 | Phase 2 | Pending |
-| ROLE-03 | Phase 2 | Pending |
-| ROLE-04 | Phase 2 | Pending |
-| ROLE-05 | Phase 2 | Pending |
-| ROLE-06 | Phase 2 | Pending |
-| ROLE-07 | Phase 2 | Pending |
-| ROLE-08 | Phase 2 | Pending |
-| ROLE-09 | Phase 2 | Pending |
-| ROLE-10 | Phase 2 | Pending |
-| ROLE-11 | Phase 2 | Pending |
+| ROLE-01 | Phase 2 | Complete |
+| ROLE-02 | Phase 2 | Complete |
+| ROLE-03 | Phase 2 | Complete |
+| ROLE-04 | Phase 2 | Complete |
+| ROLE-05 | Phase 2 | Complete |
+| ROLE-06 | Phase 2 | Complete |
+| ROLE-07 | Phase 2 | Complete |
+| ROLE-08 | Phase 2 | Complete |
+| ROLE-09 | Phase 2 | Complete |
+| ROLE-10 | Phase 2 | Complete |
+| ROLE-11 | Phase 2 | Complete |
 | INTG-01 | Phase 5 | Pending |
 | INTG-02 | Phase 5 | Pending |
 | INTG-03 | Phase 5 | Pending |
@@ -150,4 +150,4 @@ Each role is a YAML agent file + markdown system prompt:
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-04 after roadmap phase mapping*
+*Last updated: 2026-02-04 after Phase 2 completion*

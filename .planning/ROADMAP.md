@@ -13,7 +13,7 @@ This roadmap delivers a Claude Code plugin that integrates Kimi CLI as an autono
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core Wrapper** - Bare Kimi CLI invocation with role selection and validation
-- [ ] **Phase 2: Agent Roles** - Full agent YAML files, system prompts, and tool access scoping
+- [x] **Phase 2: Agent Roles** - Full agent YAML files, system prompts, and tool access scoping
 - [ ] **Phase 3: Prompt Assembly** - Templates, git diff injection, and context file loading
 - [ ] **Phase 4: Developer Experience** - Thinking mode, dry-run, verbose, and help output
 - [ ] **Phase 5: Claude Code Integration** - Slash commands, SKILL.md, and CLAUDE.md delegation rules
@@ -49,9 +49,9 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 02-01-PLAN.md -- Create 3 analysis role agents (reviewer, security, auditor) with read-only tool access
-- [ ] 02-02-PLAN.md -- Create 4 action role agents (debugger, refactorer, implementer, simplifier) with full tool access
-- [ ] 02-03-PLAN.md -- Verify all 7 agent configurations work correctly (syntax, invocation, tool restrictions, output format)
+- [x] 02-01-PLAN.md -- Create 3 analysis role agents (reviewer, security, auditor) with read-only tool access
+- [x] 02-02-PLAN.md -- Create 4 action role agents (debugger, refactorer, implementer, simplifier) with full tool access
+- [x] 02-03-PLAN.md -- Verify all 7 agent configurations work correctly (syntax, invocation, tool restrictions, output format)
 
 ### Phase 3: Prompt Assembly
 **Goal**: Users can enrich Kimi invocations with templates, git diffs, and project context without manual prompt construction
@@ -124,7 +124,7 @@ Note: Phase 3 (Prompt Assembly) depends only on Phase 1 and can be planned in pa
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Wrapper | 1/1 | Complete | 2026-02-04 |
-| 2. Agent Roles | 0/3 | Not started | - |
+| 2. Agent Roles | 3/3 | Complete | 2026-02-04 |
 | 3. Prompt Assembly | 0/TBD | Not started | - |
 | 4. Developer Experience | 0/TBD | Not started | - |
 | 5. Claude Code Integration | 0/TBD | Not started | - |
