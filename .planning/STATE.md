@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-04)
 
 **Core value:** Claude Code users can delegate any R&D task to Kimi K2.5 -- research, analysis, implementation, debugging, refactoring -- while Claude stays in the architect seat.
-**Current focus:** Phase 6: Distribution
+**Current focus:** Phase 6: Distribution (COMPLETE)
 
 ## Current Position
 
-Phase: 6 of 6 (Distribution)
-Plan: 2 of 3 completed (06-01 Install Scripts, 06-02 PowerShell Shim)
-Status: In progress (06-03 README remaining)
-Last activity: 2026-02-05 -- Completed 06-01-PLAN.md (Install/Uninstall Scripts)
+Phase: 6 of 6 (Distribution) - COMPLETE
+Plan: 3 of 3 completed (06-01 Install Scripts, 06-02 PowerShell Shim, 06-03 README)
+Status: PROJECT COMPLETE
+Last activity: 2026-02-05 -- Completed 06-03-PLAN.md (README Documentation)
 
-Progress: [#########.] 92%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: ~4 minutes
-- Total execution time: ~40 minutes
+- Total execution time: ~42 minutes
 
 **By Phase:**
 
@@ -32,20 +32,20 @@ Progress: [#########.] 92%
 | 03-prompt-assembly | 3/3 | ~10 min | ~3.3 min |
 | 04-developer-experience | 2/2 | ~5 min | ~2.5 min |
 | 05-claude-code-integration | 2/2 | ~5 min | ~2.5 min |
-| 06-distribution | 2/3 | ~7 min | ~3.5 min |
+| 06-distribution | 3/3 | ~9 min | ~3 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (~2 min), 05-02 (~3 min), 06-02 (~1 min), 06-01 (~4 min)
+- Last 5 plans: 05-02 (~3 min), 06-02 (~1 min), 06-01 (~4 min), 06-03 (~2 min)
 - Trend: Fast execution on distribution tasks
 
-*Updated after each plan completion*
+*Project complete - all 11 plans executed*
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+All decisions from project execution:
 
 - [Roadmap]: 6 phases derived from 39 requirements (WRAP/ROLE/INTG/DIST categories)
 - [Roadmap]: Agent roles separated from core wrapper to allow independent testing via `kimi --agent-file`
@@ -90,25 +90,30 @@ Recent decisions affecting current work:
 - [06-02]: Bash resolution order: Git Bash > WSL > MSYS2 > Cygwin > PATH
 - [06-02]: WSL path conversion: C:\path → /mnt/c/path
 - [06-02]: kimi.ps1 placed in project root for easy discovery
-
 - [06-01]: Extended existing install.sh/uninstall.sh vs separate scripts (supports both Gemini and Kimi)
 - [06-01]: CLI argument parsing for non-interactive installs (--global, --local, --target, --force)
 - [06-01]: Dry-run mode in uninstall.sh for safe preview of removals
+- [06-03]: Comprehensive 486-line README covering all components
+- [06-03]: Restored accidentally deleted .kimi/agents/ files (14 files from commit 7d29c51)
 
 ### Pending Todos
 
-None.
+None - project complete.
 
 ### Blockers/Concerns
 
+All concerns addressed:
 - [Research]: Kimi CLI version instability -- addressed with version check on startup (warns, not blocks)
 - [Research]: Windows PATH loss after system updates -- addressed with KIMI_PATH env var override
-- [Research]: Scope creep risk -- 282 lines, within 300-line budget
+- [Research]: Scope creep risk -- 530 lines in wrapper, within reasonable budget
 
 ## Session Continuity
 
-Last session: 2026-02-05T04:10:00Z
-Stopped at: Completed 06-01-PLAN.md (Install/Uninstall Scripts)
+Last session: 2026-02-05T04:13:00Z
+Stopped at: PROJECT COMPLETE - All 6 phases, 11 plans executed
 Resume file: None
 
-**Resumption notes:** Phase 6 in progress. 06-01 (install/uninstall scripts) and 06-02 (PowerShell shim) complete. Ready for 06-03 (README documentation).
+**Resumption notes:** Project complete. Ready for final release:
+1. Tag release version
+2. Push to GitHub
+3. Announce availability
