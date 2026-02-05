@@ -12,9 +12,9 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 Phase: 11 of 11 (Integration & Distribution)
 Plan: 1 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-05 — Completed 11-02-PLAN.md
+Last activity: 2026-02-05 — Completed 11-01-PLAN.md
 
-Progress: [███████████████████░░░░░░░░░░░░░░░░░░░░░] 47%
+Progress: [███████████████████░░░░░░░░░░░░░░░░░░░░░] 48%
 
 ## Milestones
 
@@ -100,6 +100,12 @@ Key decisions carried forward:
 **v2.0 Phase 11 decisions:**
 | Phase | Decision | Rationale |
 |-------|----------|-----------|
+| 11-01 | Maintain backward compatibility: v1.0 behavior preserved as default | Existing users can upgrade seamlessly |
+| 11-01 | v2.0 features are additive: installed alongside v1.0 components | No breaking changes for existing installations |
+| 11-01 | jq is required for MCP: clear error message with install instructions | Help users resolve dependency issues quickly |
+| 11-01 | Interactive hooks installation with --with-hooks flag | Balance user control with automation needs |
+| 11-01 | Dry-run mode for safe installation testing | Allow users to preview changes before applying |
+| 11-01 | PATH verification with helpful guidance | Ensure installed tools are accessible |
 | 11-02 | Kept v1.0 commands in quick reference | Backward compatibility for existing users |
 | 11-02 | Structured MCP/Hooks as top-level sections | Highlight v2.0 capabilities prominently |
 | 11-02 | Two-tier documentation approach | Full guide (CLAUDE.md) + concise reference (kimi-section) |
@@ -114,17 +120,17 @@ None - v2.0 planning in progress.
 
 ## Session Continuity
 
-Last session: 2026-02-05T18:50:01Z
-Stopped at: Completed 11-02-PLAN.md (Phase 11, Plan 2)
+Last session: 2026-02-05T18:32:00Z
+Stopped at: Completed 11-01-PLAN.md (Phase 11, Plan 1)
 Resume file: None
 
-**Resumption notes:** Phase 11 (Integration & Distribution) **IN PROGRESS**. Plan 2 of 4 complete:
-- 11-01: Update install.sh for v2.0 (pending)
-- 11-02: Update CLAUDE.md with v2.0 commands ✓ (CLAUDE.md, kimi-section updated)
+**Resumption notes:** Phase 11 (Integration & Distribution) **IN PROGRESS**. Plan 1 of 4 complete:
+- 11-01: Update install.sh for v2.0 ✓ (install.sh enhanced with MCP, hooks, model tools)
+- 11-02: Update CLAUDE.md with v2.0 commands (pending)
 - 11-03: Create slash commands /kimi-mcp, /kimi-hooks (pending)
 - 11-04: Create documentation guides (pending)
 
-Next: 11-03-PLAN.md or 11-01-PLAN.md
+Next: 11-02-PLAN.md
 
 ## Archives
 
