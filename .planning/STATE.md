@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 ## Current Position
 
 Phase: 8 of 11 (MCP Bridge)
-Plan: 3 of 5 in current phase
+Plan: 4 of 5 in current phase
 Status: In progress
-Last activity: 2026-02-05 — Completed 08-03-PLAN.md
+Last activity: 2026-02-05 — Completed 08-04-PLAN.md
 
-Progress: [███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 7.5%
+Progress: [███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 10%
 
 ## Milestones
 
@@ -49,6 +49,10 @@ Key decisions carried forward:
 | 8-03 | Binary file detection using 'file' command or null byte check | Skip binary files gracefully |
 | 8-03 | Tool handlers validate required 'prompt' parameter | Fail fast on invalid tool calls |
 | 8-03 | Prompt structure: system + files + context + task | Consistent prompt building across tools |
+| 8-04 | All stdout must be valid JSON-RPC (no debug prints) | Protocol compliance |
+| 8-04 | Logging to stderr only | Avoid protocol corruption |
+| 8-04 | Single sequential request processing | Simple, predictable behavior |
+| 8-04 | Tool errors return isError=true (not JSON-RPC error) | Distinguish protocol vs tool errors |
 
 ### Pending Todos
 
@@ -60,11 +64,11 @@ None - v2.0 planning in progress.
 
 ## Session Continuity
 
-Last session: 2026-02-05T16:06:44Z
-Stopped at: Completed 08-03-PLAN.md
+Last session: 2026-02-05T16:13:26Z
+Stopped at: Completed 08-04-PLAN.md
 Resume file: None
 
-**Resumption notes:** Phase 8-03 complete. Tool handlers (analyze, implement, refactor, verify) and file reading utilities ready. Next: 08-04 Main Server Executable.
+**Resumption notes:** Phase 8-04 complete. Main MCP server executable ready with message loop, method dispatch, and integration tests. Next: 08-05 CLI Integration.
 
 ## Archives
 
