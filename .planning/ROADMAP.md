@@ -18,6 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Developer Experience** - Thinking mode, dry-run, verbose, and help output
 - [x] **Phase 5: Claude Code Integration** - Slash commands, SKILL.md, and CLAUDE.md delegation rules
 - [x] **Phase 6: Distribution** - Install/uninstall scripts, PowerShell shim, README, and version pinning
+- [ ] **Phase 7: Fix Installer Agent MD** - Gap closure: copy agent system prompt MD files during installation
 
 ## Phase Details
 
@@ -117,6 +118,19 @@ Plans:
 - [x] 06-02-PLAN.md -- Create kimi.ps1 PowerShell shim for Windows
 - [x] 06-03-PLAN.md -- Create comprehensive README.md documentation
 
+### Phase 7: Fix Installer Agent MD
+**Goal**: Agent system prompt MD files are copied during installation so role invocation works post-install
+**Depends on**: Phase 6
+**Requirements**: N/A (gap closure from milestone audit)
+**Gap Closure**: Closes gaps from v1.0-MILESTONE-AUDIT.md
+**Success Criteria** (what must be TRUE):
+  1. install.sh copies .kimi/agents/*.md files to target directory alongside *.yaml files
+  2. Full Installation → Role Invocation flow works without "file not found" errors
+**Plans**: 1 plan
+
+Plans:
+- [ ] 07-01-PLAN.md — Add agent MD file copying to install.sh
+
 ## Progress
 
 **Execution Order:**
@@ -132,3 +146,4 @@ Note: Phase 3 (Prompt Assembly) depends only on Phase 1 and can be planned in pa
 | 4. Developer Experience | 2/2 | Complete | 2026-02-05 |
 | 5. Claude Code Integration | 2/2 | Complete | 2026-02-05 |
 | 6. Distribution | 3/3 | Complete | 2026-02-05 |
+| 7. Fix Installer Agent MD | 0/1 | Pending | — |
