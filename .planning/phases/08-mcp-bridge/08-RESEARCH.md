@@ -1,19 +1,29 @@
 # Phase 8: MCP Bridge - Research
 
 **Researched:** 2026-02-05
-**Domain:** Model Context Protocol (MCP) Server Implementation
+**Updated:** 2026-02-05 (Added Kimi CLI MCP client discovery)
+**Domain:** Model Context Protocol (MCP) - Kimi CLI Integration
 **Confidence:** HIGH
 
 ## Summary
 
-This research covers the implementation of an MCP server that exposes Kimi K2.5 as callable tools for external AI systems. The Model Context Protocol (MCP) is an open standard for connecting AI applications to external systems, using JSON-RPC 2.0 over stdio transport.
+**Critical Discovery:** Kimi CLI already has built-in MCP **client** support. It can connect to external MCP servers via `kimi mcp add` command. This changes our approach significantly.
+
+**Two possible architectures:**
+
+1. **MCP Server wrapping Kimi** (Original plan): Create an MCP server that exposes Kimi as tools for OTHER AI systems (Claude, etc.)
+2. **MCP Client integration** (New option): Help users configure Kimi to connect to existing MCP servers
+
+**Recommended approach:** Implement BOTH:
+- An MCP server (`kimi-mcp-server`) that exposes Kimi capabilities to external AI systems
+- A configuration helper that makes it easy to set up Kimi as an MCP client
 
 **Key findings:**
 - MCP uses JSON-RPC 2.0 with newline-delimited messages over stdio
 - The current protocol version is **2025-11-25**
+- Kimi CLI MCP client config stored in `~/.kimi/mcp.json`
+- Kimi CLI supports both HTTP and stdio MCP servers
 - Tools are defined with JSON Schema input/output schemas
-- Error handling distinguishes between protocol errors (JSON-RPC codes) and tool execution errors (`isError: true`)
-- stdio transport requires strict stdout hygiene (only MCP messages allowed)
 
 **Primary recommendation:** Implement a pure Bash MCP server that reads JSON-RPC requests from stdin, validates them using jq, invokes the Kimi CLI with appropriate parameters, and returns properly formatted JSON-RPC responses. Use stderr for logging only.
 
@@ -569,6 +579,51 @@ declare -A ERROR_CODES=(
    - What's unclear: Whether Kimi CLI provides progress information
    - Recommendation: Skip progress reporting for v1 (synchronous only per context)
 
+## Kimi CLI MCP Integration
+
+**Kimi as MCP Client:**
+Kimi CLI can act as an MCP client, connecting to external MCP servers:
+
+```bash
+# Add HTTP MCP server
+kimi mcp add --transport http context7 https://mcp.context7.com/mcp
+
+# Add stdio MCP server
+kimi mcp add --transport stdio chrome-devtools -- npx chrome-devtools-mcp@latest
+
+# List connected servers
+kimi mcp list
+
+# Test a server
+kimi mcp test context7
+```
+
+**Configuration file:** `~/.kimi/mcp.json`
+```json
+{
+  "mcpServers": {
+    "context7": {
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "your-key"
+      }
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["chrome-devtools-mcp@latest"],
+      "env": {
+        "SOME_VAR": "value"
+      }
+    }
+  }
+}
+```
+
+**Implications for Phase 8:**
+1. Our MCP server will be consumed BY Kimi (as a client) or by other AI systems
+2. We should provide easy configuration for adding our server to Kimi's MCP config
+3. The server must be compatible with Kimi's MCP client expectations
+
 ## Sources
 
 ### Primary (HIGH confidence)
@@ -577,6 +632,9 @@ declare -A ERROR_CODES=(
   - Lifecycle section: Initialization sequence
   - Tools section: Tool definition and calling
   - Cancellation section: Request cancellation
+- Kimi CLI MCP Documentation: https://moonshotai.github.io/kimi-cli/en/customization/mcp.html
+  - Kimi as MCP client capabilities
+  - Configuration format and commands
 - JSON-RPC 2.0 Specification: https://www.jsonrpc.org/specification
   - Error codes and message format
 - MCP Python SDK: https://github.com/modelcontextprotocol/python-sdk
