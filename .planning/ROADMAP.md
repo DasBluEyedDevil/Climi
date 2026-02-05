@@ -72,12 +72,30 @@
 - HOOK-01: Git pre-commit hook
 - HOOK-02: Git post-checkout hook
 - HOOK-03: Git pre-push hook
-- HOOK-04: File watcher hook (on-save)
+- HOOK-04: File watcher hook (on-save) - *deferred per context*
 - HOOK-05: Hook installer (global/local)
 - HOOK-06: Hook configuration file
 - HOOK-07: Selective hook enablement
 - HOOK-08: Hook bypass mechanism
 - HOOK-09: Dry-run mode
+
+**Plans:** 4 plans in 4 waves
+
+**Plan List:**
+- [ ] 09-01-PLAN.md — Configuration System (config file, loading, defaults)
+- [ ] 09-02-PLAN.md — Hook Scripts (pre-commit, post-checkout, pre-push)
+- [ ] 09-03-PLAN.md — Installer (global/local install, CLI tools)
+- [ ] 09-04-PLAN.md — Integration (install.sh, README, verification)
+
+**Status:** Planned (ready for execution)
+
+**Wave Structure:**
+| Wave | Plans | Description |
+|------|-------|-------------|
+| 1 | 09-01 | Configuration system (independent) |
+| 2 | 09-02 | Hook scripts (needs config) |
+| 3 | 09-03 | Installer (needs hook scripts) |
+| 4 | 09-04 | Integration (needs installer) |
 
 **Success Criteria:**
 1. Hooks install successfully (both global and per-project)
