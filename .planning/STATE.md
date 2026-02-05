@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-02-05)
 
 ## Current Position
 
-Phase: 8 of 11 (MCP Bridge) - **COMPLETE ✓**
-Plan: 5 of 5 executed and verified
-Status: Phase verified - Ready for Phase 9 (Hooks System)
-Last activity: 2026-02-05 — Phase 8 verified, bug fixed
+Phase: 9 of 11 (Hooks System) - **IN PROGRESS**
+Plan: 1 of 4 in current phase
+Status: Configuration system complete
+Last activity: 2026-02-05 — Completed 09-01-PLAN.md
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 25%
+Progress: [█████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 26%
 
 ## Milestones
 
@@ -57,6 +57,14 @@ Key decisions carried forward:
 | 8-05 | Setup helper manages ~/.kimi/mcp.json | Kimi CLI MCP client integration |
 | 8-05 | Default config only copied if not exists | Preserve user configuration changes |
 
+**v2.0 Phase 9 decisions:**
+| Phase | Decision | Rationale |
+|-------|----------|-----------|
+| 9-01 | Project config (.kimi/hooks.json) > user config (~/.config/kimi/hooks.json) | Project-specific needs take priority |
+| 9-01 | Hook-specific settings override global settings | Different hooks have different requirements |
+| 9-01 | Bypass env var configurable (default: KIMI_HOOKS_SKIP) | Consistent naming but allows customization |
+| 9-01 | Boolean validation accepts only "true"/"false" | Strict validation prevents ambiguity |
+
 ### Pending Todos
 
 None - v2.0 planning in progress.
@@ -67,18 +75,14 @@ None - v2.0 planning in progress.
 
 ## Session Continuity
 
-Last session: 2026-02-05T16:19:30Z
-Stopped at: Completed 08-05-PLAN.md (Phase 8 complete)
+Last session: 2026-02-05T16:48:33Z
+Stopped at: Completed 09-01-PLAN.md (Phase 9, Plan 1)
 Resume file: None
 
-**Resumption notes:** Phase 8 (MCP Bridge) complete. All 5 plans finished:
-- 08-01: MCP Protocol Foundation ✓
-- 08-02: Configuration Management ✓
-- 08-03: Tool Handlers ✓
-- 08-04: Main Server Executable ✓
-- 08-05: CLI Integration ✓
+**Resumption notes:** Phase 9 (Hooks System) started. Plan 09-01 complete:
+- 09-01: Hooks Configuration System ✓ (default.json, hooks-config.sh, test suite)
 
-Next: Phase 9 (Hooks System) - auto-delegate coding tasks via git hooks.
+Next: 09-02-PLAN.md (Hook Scripts) - pre-commit, post-checkout, pre-push implementations.
 
 ## Archives
 
