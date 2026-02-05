@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-04)
 ## Current Position
 
 Phase: 6 of 6 (Distribution)
-Plan: 2 of 3 completed
-Status: In progress
-Last activity: 2026-02-05 -- Completed 06-02-PLAN.md (PowerShell shim)
+Plan: 2 of 3 completed (06-01 Install Scripts, 06-02 PowerShell Shim)
+Status: In progress (06-03 README remaining)
+Last activity: 2026-02-05 -- Completed 06-01-PLAN.md (Install/Uninstall Scripts)
 
 Progress: [#########.] 92%
 
@@ -32,10 +32,10 @@ Progress: [#########.] 92%
 | 03-prompt-assembly | 3/3 | ~10 min | ~3.3 min |
 | 04-developer-experience | 2/2 | ~5 min | ~2.5 min |
 | 05-claude-code-integration | 2/2 | ~5 min | ~2.5 min |
-| 06-distribution | 2/3 | ~2 min | ~1 min |
+| 06-distribution | 2/3 | ~7 min | ~3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (~2 min), 05-01 (~2 min), 05-02 (~3 min), 06-01 (~1 min), 06-02 (~1 min)
+- Last 5 plans: 05-01 (~2 min), 05-02 (~3 min), 06-02 (~1 min), 06-01 (~4 min)
 - Trend: Fast execution on distribution tasks
 
 *Updated after each plan completion*
@@ -91,6 +91,10 @@ Recent decisions affecting current work:
 - [06-02]: WSL path conversion: C:\path → /mnt/c/path
 - [06-02]: kimi.ps1 placed in project root for easy discovery
 
+- [06-01]: Extended existing install.sh/uninstall.sh vs separate scripts (supports both Gemini and Kimi)
+- [06-01]: CLI argument parsing for non-interactive installs (--global, --local, --target, --force)
+- [06-01]: Dry-run mode in uninstall.sh for safe preview of removals
+
 ### Pending Todos
 
 None.
@@ -103,8 +107,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-05T04:05:30Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-02-05T04:10:00Z
+Stopped at: Completed 06-01-PLAN.md (Install/Uninstall Scripts)
 Resume file: None
 
-**Resumption notes:** Phase 6 in progress. 06-01 (structure) and 06-02 (PowerShell shim) complete. Ready for 06-03 (README and documentation).
+**Resumption notes:** Phase 6 in progress. 06-01 (install/uninstall scripts) and 06-02 (PowerShell shim) complete. Ready for 06-03 (README documentation).
