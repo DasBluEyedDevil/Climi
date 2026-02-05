@@ -390,10 +390,9 @@ while [[ $# -gt 0 ]]; do
         -*)
             # Pass-through: Unknown flags go directly to kimi CLI
             # This handles --thinking, --no-thinking, -y, --yolo, --print, etc.
+            # We only pass the flag itself, not the next arg (it might be the prompt).
+            # For flags with values, use --flag=value syntax.
             PASSTHROUGH_ARGS+=("$1")
-            if [[ -n "${2:-}" && ! "${2:-}" =~ ^- ]]; then
-                PASSTHROUGH_ARGS+=("$2"); shift
-            fi
             shift ;;
         *)
             PROMPT="$1"; shift ;;
