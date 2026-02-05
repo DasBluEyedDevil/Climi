@@ -1,0 +1,27 @@
+## Kimi Context Companion
+
+**Division of labor:** Kimi = Eyes (K2.5 large context analysis), Claude = Hands (implementation)
+
+**Workflow:** Analyze (Kimi) -> Implement (Claude) -> Verify (Kimi)
+
+## Delegation Rules
+
+**Delegate to Kimi when:** >100 lines, multiple files, unfamiliar code, tracing logic, pre-implementation exploration, post-change verification.
+
+**Handle directly:** Single-file edits, new code, tests/builds, docs.
+
+| Task | Command |
+|------|---------|
+| Explore | `./skills/kimi.agent.wrapper.sh -r reviewer "query"` |
+| Plan | `./skills/kimi.agent.wrapper.sh -r reviewer -t feature "query"` |
+| Debug | `./skills/kimi.agent.wrapper.sh -r debugger "query"` |
+| Security | `./skills/kimi.agent.wrapper.sh -r security "query"` |
+| Verify | `./skills/kimi.agent.wrapper.sh -t verify --diff "query"` |
+
+## Slash Commands
+
+`/kimi-analyze` | `/kimi-trace` | `/kimi-verify` | `/kimi-audit`
+
+## Roles
+
+`reviewer` `auditor` `debugger` `security` `refactorer` `implementer` `simplifier`
