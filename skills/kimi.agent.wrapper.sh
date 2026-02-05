@@ -392,13 +392,35 @@ if [[ ${#PASSTHROUGH_ARGS[@]} -gt 0 ]]; then
     cmd+=("${PASSTHROUGH_ARGS[@]}")
 fi
 
-# Assemble final prompt: template content + user prompt
+# Step 5: Capture context file and git diff content
+CONTEXT_SECTION=$(load_context_file "${WORK_DIR:-.}") || true
+DIFF_SECTION=""
+if [[ "$DIFF_MODE" == "true" ]]; then
+    DIFF_SECTION=$(capture_git_diff "${WORK_DIR:-.}") || true
+fi
+
+# Step 6: Assemble final prompt in order: Template → Context → Diff → User prompt
+ASSEMBLED_PROMPT="$PROMPT"
+
+# Prepend diff if captured
+if [[ -n "$DIFF_SECTION" ]]; then
+    ASSEMBLED_PROMPT="${DIFF_SECTION}
+
+${ASSEMBLED_PROMPT}"
+fi
+
+# Prepend context file if loaded
+if [[ -n "$CONTEXT_SECTION" ]]; then
+    ASSEMBLED_PROMPT="${CONTEXT_SECTION}
+
+${ASSEMBLED_PROMPT}"
+fi
+
+# Prepend template if specified
 if [[ -n "$TEMPLATE_CONTENT" ]]; then
     ASSEMBLED_PROMPT="${TEMPLATE_CONTENT}
 
-${PROMPT}"
-else
-    ASSEMBLED_PROMPT="$PROMPT"
+${ASSEMBLED_PROMPT}"
 fi
 
 # Add prompt as final argument
