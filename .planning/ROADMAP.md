@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Core Wrapper** - Bare Kimi CLI invocation with role selection and validation
 - [x] **Phase 2: Agent Roles** - Full agent YAML files, system prompts, and tool access scoping
 - [x] **Phase 3: Prompt Assembly** - Templates, git diff injection, and context file loading
-- [ ] **Phase 4: Developer Experience** - Thinking mode, dry-run, verbose, and help output
+- [x] **Phase 4: Developer Experience** - Thinking mode, dry-run, verbose, and help output
 - [ ] **Phase 5: Claude Code Integration** - Slash commands, SKILL.md, and CLAUDE.md delegation rules
 - [ ] **Phase 6: Distribution** - Install/uninstall scripts, PowerShell shim, README, and version pinning
 
@@ -81,8 +81,8 @@ Plans:
 **Plans**: 2 plans in 1 wave (parallel)
 
 Plans:
-- [ ] 04-01-PLAN.md -- Enhanced help output with dynamic role/template enumeration and thinking flag documentation
-- [ ] 04-02-PLAN.md -- Verbose mode and dry-run mode for debugging wrapper behavior
+- [x] 04-01-PLAN.md -- Enhanced help output with dynamic role/template enumeration and thinking flag documentation
+- [x] 04-02-PLAN.md -- Verbose mode and dry-run mode for debugging wrapper behavior
 
 ### Phase 5: Claude Code Integration
 **Goal**: Claude Code users can delegate work to Kimi via slash commands, and Claude knows when and how to invoke Kimi autonomously
@@ -129,6 +129,6 @@ Note: Phase 3 (Prompt Assembly) depends only on Phase 1 and can be planned in pa
 | 1. Core Wrapper | 1/1 | Complete | 2026-02-04 |
 | 2. Agent Roles | 3/3 | Complete | 2026-02-04 |
 | 3. Prompt Assembly | 3/3 | Complete | 2026-02-05 |
-| 4. Developer Experience | 0/2 | Not started | - |
+| 4. Developer Experience | 2/2 | Complete | 2026-02-05 |
 | 5. Claude Code Integration | 0/TBD | Not started | - |
 | 6. Distribution | 0/TBD | Not started | - |

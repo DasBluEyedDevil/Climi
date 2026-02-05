@@ -15,13 +15,13 @@
 - [x] **WRAP-06**: Git diff injection via `--diff [TARGET]` captures `git diff` output and prepends to prompt
 - [x] **WRAP-07**: Context file injection: auto-loads `KimiContext.md` or `.kimi/context.md` and prepends to prompt
 - [ ] **WRAP-08**: Model selection pass-through via `-m <model>` flag
-- [ ] **WRAP-09**: Thinking mode pass-through via `--thinking` flag
+- [x] **WRAP-09**: Thinking mode pass-through via `--thinking` flag
 - [ ] **WRAP-10**: Working directory pass-through via `-w <path>` flag
-- [ ] **WRAP-11**: Dry-run mode (`--dry-run`) shows constructed command without executing
+- [x] **WRAP-11**: Dry-run mode (`--dry-run`) shows constructed command without executing
 - [ ] **WRAP-12**: Kimi CLI presence check on startup with helpful install instructions on failure
 - [ ] **WRAP-13**: Kimi CLI version check on startup (warn if below minimum supported version)
-- [ ] **WRAP-14**: Verbose mode (`--verbose`) for debugging wrapper behavior
-- [ ] **WRAP-15**: Usage/help output (`-h`/`--help`) documenting all flags and roles
+- [x] **WRAP-14**: Verbose mode (`--verbose`) for debugging wrapper behavior
+- [x] **WRAP-15**: Usage/help output (`-h`/`--help`) documenting all flags and roles
 
 ### Agent Roles
 
@@ -111,13 +111,13 @@ Each role is a YAML agent file + markdown system prompt:
 | WRAP-06 | Phase 3 | Complete |
 | WRAP-07 | Phase 3 | Complete |
 | WRAP-08 | Phase 1 | Pending |
-| WRAP-09 | Phase 4 | Pending |
+| WRAP-09 | Phase 4 | Complete |
 | WRAP-10 | Phase 1 | Pending |
-| WRAP-11 | Phase 4 | Pending |
+| WRAP-11 | Phase 4 | Complete |
 | WRAP-12 | Phase 1 | Pending |
 | WRAP-13 | Phase 1 | Pending |
-| WRAP-14 | Phase 4 | Pending |
-| WRAP-15 | Phase 4 | Pending |
+| WRAP-14 | Phase 4 | Complete |
+| WRAP-15 | Phase 4 | Complete |
 | ROLE-01 | Phase 2 | Complete |
 | ROLE-02 | Phase 2 | Complete |
 | ROLE-03 | Phase 2 | Complete |
@@ -150,4 +150,4 @@ Each role is a YAML agent file + markdown system prompt:
 
 ---
 *Requirements defined: 2026-02-04*
-*Last updated: 2026-02-05 after Phase 3 completion*
+*Last updated: 2026-02-05 after Phase 4 completion*
