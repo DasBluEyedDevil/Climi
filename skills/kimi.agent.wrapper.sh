@@ -46,6 +46,18 @@ VERBOSE=false
 DRY_RUN=false
 PASSTHROUGH_ARGS=()
 
+# -- Auto-Model Selection ----------------------------------------------------
+AUTO_MODEL_ENABLED=false
+SHOW_COST=false
+CONFIDENCE_THRESHOLD=75
+COST_THRESHOLD=10000
+SELECTED_MODEL=""
+MODEL_CONFIDENCE=0
+
+# -- Session Management ------------------------------------------------------
+SESSION_ID="${KIMI_SESSION_ID:-}"
+SESSION_FILE=""
+
 # -- Utility functions -------------------------------------------------------
 
 die() { echo "Error: $1" >&2; exit "${2:-1}"; }
@@ -54,6 +66,14 @@ warn() { echo "Warning: $1" >&2; }
 log_verbose() {
     [[ "$VERBOSE" == "true" ]] || return 0
     echo "[verbose] $*" >&2
+}
+
+log_model_selection() {
+    echo "[model-selection] $*" >&2
+}
+
+log_session() {
+    echo "[session] $*" >&2
 }
 
 # Capture git diff output for injection into prompt context
@@ -300,6 +320,225 @@ die_template_not_found() {
     fi
     exit "$EXIT_TEMPLATE_NOT_FOUND"
 }
+
+# -- Auto-Model Selection Functions ------------------------------------------
+
+# extract_file_paths(prompt)
+# Extracts potential file paths from a prompt using regex
+# Arguments:
+#   $1 - Prompt text
+# Returns:
+#   Space-separated list of file paths
+extract_file_paths() {
+    local prompt="$1"
+    local paths=""
+    
+    # Extract paths matching common file patterns
+    # Pattern: alphanumeric, underscores, dots, slashes, ending with extension
+    paths=$(echo "$prompt" | grep -oE '[[:alnum:]_./-]+\.[[:alnum:]]+' 2>/dev/null || true)
+    
+    # Filter to only include paths that exist
+    local valid_paths=""
+    for path in $paths; do
+        # Check if it's a relative path from work dir
+        local full_path="${WORK_DIR:-.}/$path"
+        if [[ -f "$full_path" || -f "$path" ]]; then
+            valid_paths="$valid_paths $path"
+        fi
+    done
+    
+    echo "$valid_paths" | tr ' ' '\n' | sort -u | tr '\n' ' '
+}
+
+# auto_select_model(prompt)
+# Automatically selects the appropriate model based on task and files
+# Arguments:
+#   $1 - Prompt text
+# Sets globals:
+#   SELECTED_MODEL - The selected model (k2 or k2.5)
+#   MODEL_CONFIDENCE - Confidence score (0-100)
+auto_select_model() {
+    local prompt="$1"
+    # Try multiple paths for the selector
+    local selector=""
+    local possible_paths=(
+        "${SCRIPT_DIR}/kimi-model-selector.sh"
+        "${SCRIPT_DIR}/../skills/kimi-model-selector.sh"
+        "./kimi-model-selector.sh"
+        "$(pwd)/kimi-model-selector.sh"
+    )
+    
+    for path in "${possible_paths[@]}"; do
+        if [[ -f "$path" && -x "$path" ]]; then
+            selector="$path"
+            break
+        fi
+    done
+    
+    # Check if selector exists
+    if [[ -z "$selector" ]]; then
+        log_model_selection "Model selector not found in any expected location"
+        SELECTED_MODEL="k2"
+        MODEL_CONFIDENCE=50
+        return 1
+    fi
+    
+    # Extract file paths from prompt
+    local files
+    files=$(extract_file_paths "$prompt")
+    
+    # Build selector command
+    local selector_cmd=("$selector" --task "$prompt" --json)
+    # Trim whitespace and check if files is non-empty
+    files=$(echo "$files" | tr -d '[:space:]')
+    if [[ -n "$files" ]]; then
+        # Convert space-separated to comma-separated
+        local files_csv=""
+        for f in $files; do
+            [[ -n "$files_csv" ]] && files_csv="${files_csv},"
+            files_csv="${files_csv}${f}"
+        done
+        selector_cmd+=(--files "$files_csv")
+    fi
+    
+    log_verbose "Running model selector: ${selector_cmd[*]}"
+    
+    # Run selector and capture output
+    local result
+    if result=$("${selector_cmd[@]}" 2>/dev/null); then
+        # Parse JSON result
+        if command -v jq >/dev/null 2>&1; then
+            SELECTED_MODEL=$(echo "$result" | jq -r '.model // "k2"')
+            MODEL_CONFIDENCE=$(echo "$result" | jq -r '.confidence // 50')
+            local override=$(echo "$result" | jq -r '.override // false')
+            
+            if [[ "$override" == "true" ]]; then
+                log_model_selection "Override active: $SELECTED_MODEL (KIMI_FORCE_MODEL)"
+            else
+                log_model_selection "Selected: $SELECTED_MODEL (confidence: ${MODEL_CONFIDENCE}%)"
+            fi
+        else
+            # Fallback: simple grep extraction
+            SELECTED_MODEL=$(echo "$result" | grep -oP '"model":\s*"\K[^"]+' || echo "k2")
+            MODEL_CONFIDENCE=$(echo "$result" | grep -oP '"confidence":\s*\K[0-9]+' || echo 50)
+            log_model_selection "Selected: $SELECTED_MODEL (confidence: ${MODEL_CONFIDENCE}%)"
+        fi
+    else
+        log_model_selection "Model selector failed, using default: k2"
+        SELECTED_MODEL="k2"
+        MODEL_CONFIDENCE=50
+        return 1
+    fi
+}
+
+# estimate_and_display_cost(prompt, model)
+# Estimates cost and displays it to stderr
+# Arguments:
+#   $1 - Prompt text
+#   $2 - Model name
+# Returns:
+#   Cost units (integer)
+estimate_and_display_cost() {
+    local prompt="$1"
+    local model="${2:-k2}"
+    # Try multiple paths for the estimator
+    local estimator=""
+    local possible_paths=(
+        "${SCRIPT_DIR}/kimi-cost-estimator.sh"
+        "${SCRIPT_DIR}/../skills/kimi-cost-estimator.sh"
+        "./kimi-cost-estimator.sh"
+        "$(pwd)/kimi-cost-estimator.sh"
+    )
+    
+    for path in "${possible_paths[@]}"; do
+        if [[ -f "$path" && -x "$path" ]]; then
+            estimator="$path"
+            break
+        fi
+    done
+    
+    # Check if estimator exists
+    if [[ -z "$estimator" ]]; then
+        log_verbose "Cost estimator not found in any expected location"
+        return 1
+    fi
+    
+    # Extract file paths
+    local files
+    files=$(extract_file_paths "$prompt")
+    
+    # Build estimator command
+    local estimator_cmd=("$estimator" --prompt "$prompt" --model "$model")
+    if [[ -n "$files" ]]; then
+        local files_csv=""
+        for f in $files; do
+            [[ -n "$files_csv" ]] && files_csv="${files_csv},"
+            files_csv="${files_csv}${f}"
+        done
+        estimator_cmd+=(--files "$files_csv")
+    fi
+    
+    log_verbose "Running cost estimator: ${estimator_cmd[*]}"
+    
+    # Run estimator and capture cost
+    local cost_output
+    if cost_output=$("${estimator_cmd[@]}" 2>&1); then
+        # Extract cost from output (format: "Cost estimate: ~N tokens (model, speed)")
+        local cost_units
+        if [[ "$cost_output" =~ ~([0-9,]+)\ tokens ]]; then
+            # Remove commas and extract number
+            cost_units=$(echo "${BASH_REMATCH[1]}" | tr -d ',')
+        else
+            cost_units=0
+        fi
+        
+        log_model_selection "Cost estimate: $cost_output"
+        echo "$cost_units"
+        return 0
+    else
+        log_verbose "Cost estimation failed"
+        return 1
+    fi
+}
+
+# -- Session Management Functions --------------------------------------------
+
+# get_session_id()
+# Gets or generates a session ID for context preservation
+# Returns:
+#   Session ID string
+get_session_id() {
+    # If already set (from env var or previous call), return it
+    if [[ -n "$SESSION_ID" ]]; then
+        echo "$SESSION_ID"
+        return 0
+    fi
+    
+    # Generate new session ID: timestamp + random
+    local timestamp
+    timestamp=$(date +%s 2>/dev/null || echo "$(date +%s)" 2>/dev/null || echo "0")
+    local random_suffix="${RANDOM:-$((RANDOM % 10000))}"
+    
+    SESSION_ID="kimi-${timestamp}-${random_suffix}"
+    echo "$SESSION_ID"
+}
+
+# persist_session_id()
+# Saves session ID to temp file for persistence
+persist_session_id() {
+    if [[ -z "$SESSION_ID" ]]; then
+        return 1
+    fi
+    
+    SESSION_FILE="/tmp/kimi-session-$$"
+    echo "$SESSION_ID" > "$SESSION_FILE"
+    
+    # Set trap to clean up on exit
+    trap 'rm -f "$SESSION_FILE"' EXIT
+    
+    log_session "Session persisted: $SESSION_ID"
+}
+
 # -- Usage -------------------------------------------------------------------
 
 usage() {
@@ -309,24 +548,36 @@ kimi.agent.wrapper.sh -- Kimi CLI wrapper with role-based agent selection
 Usage: kimi.agent.wrapper.sh [OPTIONS] PROMPT
 
 Wrapper Options:
-  -r, --role ROLE      Agent role (maps to .kimi/agents/ROLE.yaml)
-  -m, --model MODEL    Kimi model (default: kimi-for-coding)
-  -w, --work-dir PATH  Working directory for Kimi
-  -t, --template TPL   Template to prepend (maps to .kimi/templates/TPL.md)
-  --diff               Include git diff (HEAD vs working tree) in prompt context
-  --dry-run            Show command without executing
-  --verbose            Show wrapper debug output
-  -h, --help           Show this help and exit
+  -r, --role ROLE         Agent role (maps to .kimi/agents/ROLE.yaml)
+  -m, --model MODEL       Kimi model (default: kimi-for-coding)
+  -w, --work-dir PATH     Working directory for Kimi
+  -t, --template TPL      Template to prepend (maps to .kimi/templates/TPL.md)
+  --diff                  Include git diff (HEAD vs working tree) in prompt context
+  --dry-run               Show command without executing
+  --verbose               Show wrapper debug output
+  -h, --help              Show this help and exit
+
+Auto-Model Selection Options:
+  --auto-model            Enable automatic model selection (K2 vs K2.5)
+  --show-cost             Display cost estimate before delegation
+  --confidence-threshold  N  Set confidence threshold (default: 75)
+
+Session Management Options:
+  --session-id ID         Explicit session ID for context preservation
 
 Kimi CLI Options (pass-through):
-  --thinking           Enable thinking mode for deeper reasoning
-  --no-thinking        Disable thinking mode
-  -y, --yes, --yolo    Auto-approve all actions
-  --print              Run in non-interactive print mode
+  --thinking              Enable thinking mode for deeper reasoning
+  --no-thinking           Disable thinking mode
+  -y, --yes, --yolo       Auto-approve all actions
+  --print                 Run in non-interactive print mode
   (and any other kimi CLI flags)
 
 Environment Variables:
-  KIMI_PATH            Override kimi binary location
+  KIMI_PATH               Override kimi binary location
+  KIMI_FORCE_MODEL        Force model selection (k2 or k2.5)
+  KIMI_SESSION_ID         Default session ID for context preservation
+  KIMI_CONFIDENCE_THRESHOLD  Default confidence threshold
+  KIMI_COST_THRESHOLD     Default cost threshold
 
 Prompt can also be piped via stdin.
 Unknown flags are passed through to kimi CLI.
@@ -381,6 +632,16 @@ while [[ $# -gt 0 ]]; do
             VERBOSE=true; shift ;;
         --dry-run)
             DRY_RUN=true; shift ;;
+        --auto-model)
+            AUTO_MODEL_ENABLED=true; shift ;;
+        --show-cost)
+            SHOW_COST=true; shift ;;
+        --confidence-threshold)
+            [[ -z "${2:-}" ]] && die "Option $1 requires an argument" "$EXIT_BAD_ARGS"
+            CONFIDENCE_THRESHOLD="$2"; shift 2 ;;
+        --session-id)
+            [[ -z "${2:-}" ]] && die "Option $1 requires an argument" "$EXIT_BAD_ARGS"
+            SESSION_ID="$2"; shift 2 ;;
         -h|--help)
             usage ;;
         --)
@@ -441,6 +702,57 @@ log_verbose "Template: ${TEMPLATE:-none}"
 
 log_verbose "Model: $MODEL, Role: ${ROLE:-none}"
 
+# -- Auto-Model Selection ----------------------------------------------------
+
+# Step 5: Auto-model selection (if enabled)
+if [[ "$AUTO_MODEL_ENABLED" == "true" ]]; then
+    log_verbose "Auto-model selection enabled"
+    
+    # Check for user override first
+    if [[ -n "${KIMI_FORCE_MODEL:-}" ]]; then
+        normalized_override=$(echo "$KIMI_FORCE_MODEL" | tr '[:upper:]' '[:lower:]')
+        if [[ "$normalized_override" == "k2" || "$normalized_override" == "k2.5" || "$normalized_override" == "k2_5" ]]; then
+            if [[ "$normalized_override" == "k2_5" ]]; then
+                normalized_override="k2.5"
+            fi
+            SELECTED_MODEL="$normalized_override"
+            MODEL_CONFIDENCE=100
+            log_model_selection "Override active: $SELECTED_MODEL (KIMI_FORCE_MODEL)"
+        else
+            log_warn "Invalid KIMI_FORCE_MODEL: $KIMI_FORCE_MODEL"
+            auto_select_model "$PROMPT"
+        fi
+    else
+        # Run auto-selection
+        auto_select_model "$PROMPT"
+    fi
+    
+    # Estimate and display cost if requested or confidence is low
+    cost_units=0
+    if [[ "$SHOW_COST" == "true" || $MODEL_CONFIDENCE -lt $CONFIDENCE_THRESHOLD ]]; then
+        cost_units=$(estimate_and_display_cost "$PROMPT" "$SELECTED_MODEL" || echo 0)
+    fi
+    
+    # Warn if confidence is low
+    if [[ $MODEL_CONFIDENCE -lt $CONFIDENCE_THRESHOLD ]]; then
+        log_model_selection "Warning: Low confidence ($MODEL_CONFIDENCE% < $CONFIDENCE_THRESHOLD%)"
+        log_model_selection "Override with KIMI_FORCE_MODEL=k2 or k2.5"
+    fi
+    
+    # Use selected model
+    MODEL="$SELECTED_MODEL"
+    log_verbose "Final model selection: $MODEL"
+fi
+
+# -- Session Management ------------------------------------------------------
+
+# Step 6: Setup session for context preservation
+if [[ -z "$SESSION_ID" ]]; then
+    SESSION_ID=$(get_session_id)
+fi
+persist_session_id
+log_session "Using session: $SESSION_ID"
+
 # -- Command construction and invocation -------------------------------------
 
 # Build command as array (never eval or string concatenation)
@@ -456,20 +768,23 @@ cmd+=("--model" "$MODEL")
 # Add working directory if specified
 [[ -n "$WORK_DIR" ]] && cmd+=("--work-dir" "$WORK_DIR")
 
+# Add session for context preservation
+[[ -n "$SESSION_ID" ]] && cmd+=("--session" "$SESSION_ID")
+
 # Add passthrough arguments (unknown flags forwarded to kimi CLI)
 if [[ ${#PASSTHROUGH_ARGS[@]} -gt 0 ]]; then
     cmd+=("${PASSTHROUGH_ARGS[@]}")
 fi
 log_verbose "Passthrough args: ${PASSTHROUGH_ARGS[*]}"
 
-# Step 5: Capture context file and git diff content
+# Step 8: Capture context file and git diff content
 CONTEXT_SECTION=$(load_context_file "${WORK_DIR:-.}") || true
 DIFF_SECTION=""
 if [[ "$DIFF_MODE" == "true" ]]; then
     DIFF_SECTION=$(capture_git_diff "${WORK_DIR:-.}") || true
 fi
 
-# Step 6: Assemble final prompt in order: Template → Context → Diff → User prompt
+# Step 9: Assemble final prompt in order: Template → Context → Diff → User prompt
 ASSEMBLED_PROMPT="$PROMPT"
 
 # Prepend diff if captured
