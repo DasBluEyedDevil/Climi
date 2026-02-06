@@ -839,6 +839,8 @@ if [[ "$DRY_RUN" == "true" ]]; then
 fi
 
 # Execute kimi and propagate its exit code
+# Set Python encoding for Windows compatibility (handles Unicode output from kimi)
+export PYTHONIOENCODING=utf-8
 kimi_exit=0
 "${cmd[@]}" || kimi_exit=$?
 exit "$kimi_exit"

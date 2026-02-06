@@ -581,6 +581,9 @@ mcp_call_kimi() {
     local output
     local exit_code
 
+    # Set Python encoding for Windows compatibility (handles Unicode output from kimi)
+    export PYTHONIOENCODING=utf-8
+
     # Use timeout command to enforce time limit
     # Exit code 124 means timeout occurred
     output=$(timeout "$timeout_sec" kimi -m "$model" "$prompt" 2>&1)
