@@ -4,7 +4,7 @@
 #
 # Usage: kimi.agent.wrapper.sh [OPTIONS] PROMPT
 #   -r, --role ROLE      Agent role (maps to .kimi/agents/ROLE.yaml)
-#   -m, --model MODEL    Kimi model (default: kimi-for-coding)
+#   -m, --model MODEL    Kimi model (default: kimi-code/kimi-for-coding)
 #   -w, --work-dir PATH  Working directory for Kimi
 #   -t, --template TPL   Template to prepend (maps to .kimi/templates/TPL.md)
 #   --diff               Include git diff in prompt context
@@ -33,7 +33,7 @@ readonly EXIT_NO_PROMPT=13
 readonly EXIT_TEMPLATE_NOT_FOUND=14
 
 # -- Defaults ----------------------------------------------------------------
-DEFAULT_MODEL="kimi-for-coding"
+DEFAULT_MODEL="kimi-code/kimi-for-coding"
 MIN_VERSION="1.7.0"
 ROLE=""
 MODEL="$DEFAULT_MODEL"
@@ -549,7 +549,7 @@ Usage: kimi.agent.wrapper.sh [OPTIONS] PROMPT
 
 Wrapper Options:
   -r, --role ROLE         Agent role (maps to .kimi/agents/ROLE.yaml)
-  -m, --model MODEL       Kimi model (default: kimi-for-coding)
+  -m, --model MODEL       Kimi model (default: kimi-code/kimi-for-coding)
   -w, --work-dir PATH     Working directory for Kimi
   -t, --template TPL      Template to prepend (maps to .kimi/templates/TPL.md)
   --diff                  Include git diff (HEAD vs working tree) in prompt context
@@ -739,8 +739,8 @@ if [[ "$AUTO_MODEL_ENABLED" == "true" ]]; then
         log_model_selection "Override with KIMI_FORCE_MODEL=k2 or k2.5"
     fi
     
-    # Use selected model
-    MODEL="$SELECTED_MODEL"
+    # Use selected model (prepend provider prefix for Kimi CLI format)
+    MODEL="kimi-code/$SELECTED_MODEL"
     log_verbose "Final model selection: $MODEL"
 fi
 
