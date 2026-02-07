@@ -1,3 +1,7 @@
+---
+description: Install and manage git hooks for auto-delegation to Kimi
+---
+
 # Kimi Hooks
 
 Manage git hooks for automatic Kimi delegation.

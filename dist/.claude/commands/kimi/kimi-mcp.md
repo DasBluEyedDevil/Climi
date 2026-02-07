@@ -1,3 +1,7 @@
+---
+description: Start and configure Kimi MCP server for external tool integration
+---
+
 # Kimi MCP
 
 Manage the Kimi MCP server for external tool integration.

@@ -1,3 +1,7 @@
+---
+description: Trace code patterns and logic across the codebase using Kimi
+---
+
 # Kimi Trace
 
 Delegate bug tracing and debugging investigation to Kimi K2.5.
@@ -86,4 +90,3 @@ bash ~/.claude/skills/kimi.agent.wrapper.sh -r debugger "[bug description]"
 - The debugger role has FULL tool access (unlike read-only analysis roles)
 - Review the "Commands executed" section for audit trail
 - Use the file:line references to implement the recommended fixes
-

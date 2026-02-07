@@ -431,6 +431,6 @@ Existing workflows continue to work unchanged. v2.0 features are **opt-in**:
 
 ---
 
-**Version:** 2.0  
-**Last Updated:** 2026-02-05  
+**Version:** 2.0
+**Last Updated:** 2026-02-05
 **See Also:** `skills/kimi-model-selector.sh`, `skills/kimi-cost-estimator.sh`

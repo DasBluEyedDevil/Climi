@@ -1,3 +1,7 @@
+---
+description: Security and code quality audit using Kimi K2.5
+---
+
 # Kimi Audit
 
 Delegate code quality and architecture audits to Kimi K2.5.
@@ -85,4 +89,3 @@ bash ~/.claude/skills/kimi.agent.wrapper.sh -r auditor -w [directory] "[focus ar
 - The auditor role is read-only (no file modifications)
 - For security-specific audits, use `-r security` instead
 - Prioritize recommendations by severity when addressing findings
-

@@ -1,6 +1,10 @@
+---
+description: Deep codebase analysis using Kimi K2.5's large context window
+---
+
 # Kimi Analyze
 
-Delegate codebase analysis to Kimi K2.5's large context window (1M+ tokens).
+Delegate codebase analysis to Kimi K2.5's large context window.
 
 ## Usage
 
@@ -70,4 +74,3 @@ bash ~/.claude/skills/kimi.agent.wrapper.sh -r reviewer -w [directory] "[questio
 - The reviewer role is read-only (no file modifications)
 - Parse the SUMMARY and FILES sections to guide your implementation
 - Use file:line references to read specific code sections
-

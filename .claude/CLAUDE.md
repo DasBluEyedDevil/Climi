@@ -56,7 +56,7 @@ The system intelligently selects between K2 and K2.5:
 ### Analysis Commands
 
 #### `/kimi-analyze [directory] [question]`
-Deep codebase analysis with 1M+ token context.
+Deep codebase analysis using Kimi's large context window.
 
 **Example:**
 ```

@@ -1,0 +1,22 @@
+# LLM tool configs and local state (not installer artifacts)
+.claude/commands/
+.claude/skills/
+.claude/settings.json
+.claude/CLAUDE.md.kimi-section
+
+# IDE
+.idea/
+
+# OpenCode
+.opencode/
+
+# Daemon MCP local storage
+.daem0nmcp/
+
+# Kimi local hooks config
+.kimi/hooks.json
+
+# GSD planning artifacts (untracked phases/verifications)
+.planning/phases/*/03-*-PLAN.md
+.planning/phases/*/05-VERIFICATION.md
+.planning/phases/*/06-VERIFICATION.md

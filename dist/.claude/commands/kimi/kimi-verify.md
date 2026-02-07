@@ -1,3 +1,7 @@
+---
+description: Verify implementation changes for consistency and regressions
+---
+
 # Kimi Verify
 
 Verify implementation changes for consistency and regressions using Kimi K2.5.
@@ -98,4 +102,3 @@ bash ~/.claude/skills/kimi.agent.wrapper.sh -t verify --diff "[change descriptio
 - The --diff flag captures all staged and unstaged changes vs HEAD
 - Address any RECOMMENDATIONS before considering implementation complete
 - For security-sensitive changes, add `-r security` for deeper security analysis
-

@@ -870,23 +870,23 @@ if [ -d "$SCRIPT_DIR/.kimi/templates" ] && ls "$SCRIPT_DIR/.kimi/templates/"*.md
 fi
 
 # Copy Kimi skill definition
-if [ -f "$SCRIPT_DIR/.claude/skills/kimi-delegation/SKILL.md" ]; then
+if [ -f "$SCRIPT_DIR/dist/.claude/skills/kimi-delegation/SKILL.md" ]; then
     if [ "$INSTALL_MODE" = "global" ]; then
-        cp "$SCRIPT_DIR/.claude/skills/kimi-delegation/SKILL.md" "$TARGET_DIR/skills/kimi-delegation/"
+        cp "$SCRIPT_DIR/dist/.claude/skills/kimi-delegation/SKILL.md" "$TARGET_DIR/skills/kimi-delegation/"
     else
-        cp "$SCRIPT_DIR/.claude/skills/kimi-delegation/SKILL.md" "$TARGET_DIR/.claude/skills/kimi-delegation/"
+        cp "$SCRIPT_DIR/dist/.claude/skills/kimi-delegation/SKILL.md" "$TARGET_DIR/.claude/skills/kimi-delegation/"
     fi
     echo -e "  ${GREEN}✓${NC} Copied Kimi skill definition"
 fi
 
 # Copy Kimi slash commands
-if [ -d "$SCRIPT_DIR/.claude/commands/kimi" ] && ls "$SCRIPT_DIR/.claude/commands/kimi/"*.md &> /dev/null 2>&1; then
+if [ -d "$SCRIPT_DIR/dist/.claude/commands/kimi" ] && ls "$SCRIPT_DIR/dist/.claude/commands/kimi/"*.md &> /dev/null 2>&1; then
     if [ "$INSTALL_MODE" = "global" ]; then
-        cp "$SCRIPT_DIR/.claude/commands/kimi/"*.md "$TARGET_DIR/commands/kimi/"
+        cp "$SCRIPT_DIR/dist/.claude/commands/kimi/"*.md "$TARGET_DIR/commands/kimi/"
     else
-        cp "$SCRIPT_DIR/.claude/commands/kimi/"*.md "$TARGET_DIR/.claude/commands/kimi/"
+        cp "$SCRIPT_DIR/dist/.claude/commands/kimi/"*.md "$TARGET_DIR/.claude/commands/kimi/"
     fi
-    echo -e "  ${GREEN}✓${NC} Copied Kimi slash commands ($(ls -1 "$SCRIPT_DIR/.claude/commands/kimi/"*.md 2>/dev/null | wc -l) files)"
+    echo -e "  ${GREEN}✓${NC} Copied Kimi slash commands ($(ls -1 "$SCRIPT_DIR/dist/.claude/commands/kimi/"*.md 2>/dev/null | wc -l) files)"
 fi
 
 # Create .kimi-version file
@@ -1023,11 +1023,11 @@ install_hooks_interactive
 # -- Shared Components --
 
 # Copy other slash commands (if provided)
-if ls "$SCRIPT_DIR/.claude/commands/"*.md &> /dev/null 2>&1; then
+if ls "$SCRIPT_DIR/dist/.claude/commands/"*.md &> /dev/null 2>&1; then
     if [ "$INSTALL_MODE" = "global" ]; then
-        cp "$SCRIPT_DIR/.claude/commands/"*.md "$TARGET_DIR/commands/" 2>/dev/null || true
+        cp "$SCRIPT_DIR/dist/.claude/commands/"*.md "$TARGET_DIR/commands/" 2>/dev/null || true
     else
-        cp "$SCRIPT_DIR/.claude/commands/"*.md "$TARGET_DIR/.claude/commands/" 2>/dev/null || true
+        cp "$SCRIPT_DIR/dist/.claude/commands/"*.md "$TARGET_DIR/.claude/commands/" 2>/dev/null || true
     fi
     echo -e "  ${GREEN}✓${NC} Copied slash commands"
 fi
@@ -1037,10 +1037,10 @@ if [ "$INSTALL_MODE" != "global" ]; then
     SETTINGS_FILE="$TARGET_DIR/.claude/settings.json"
     if [ -f "$SETTINGS_FILE" ]; then
         echo -e "  ${YELLOW}⚠${NC} .claude/settings.json exists - not overwriting"
-        echo -e "    ${CYAN}→${NC} See $SCRIPT_DIR/.claude/settings.json for hook examples"
+        echo -e "    ${CYAN}→${NC} See $SCRIPT_DIR/dist/.claude/settings.json for hook examples"
     else
         mkdir -p "$TARGET_DIR/.claude"
-        cp "$SCRIPT_DIR/.claude/settings.json" "$SETTINGS_FILE"
+        cp "$SCRIPT_DIR/dist/.claude/settings.json" "$SETTINGS_FILE"
         echo -e "  ${GREEN}✓${NC} Copied settings.json with hooks"
     fi
 fi
